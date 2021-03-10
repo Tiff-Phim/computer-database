@@ -14,7 +14,7 @@ import java.util.Properties;
  * @version 0.1
  */
 public class DBConnection {
-
+	
 	private static final String PROP_FILE_NAME = "resources/config/db.properties";
 	private static final String PROPERTY_URL = "db.url";
 	private static final String PROPERTY_USER = "db.user";
@@ -45,7 +45,7 @@ public class DBConnection {
 	 * 
 	 * @return instance of DBConnection (unique)
 	 */
-	synchronized public static DBConnection getInstance() {
+	public static synchronized DBConnection getInstance() {
 		if (instance == null) {
 			instance = new DBConnection();
 		}
@@ -61,5 +61,4 @@ public class DBConnection {
 	public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(url, user, pw);
 	}
-	
 }

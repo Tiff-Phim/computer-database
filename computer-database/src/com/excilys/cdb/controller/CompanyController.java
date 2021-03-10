@@ -14,5 +14,9 @@ public class CompanyController {
 	public List<Company> getAll() throws SQLException {
 		return companyBLOService.getAllCompany();
 	}
+	
+	public Company getCompanyByName(String companyName) throws SQLException {
+		return companyBLOService.getCompanyByName(companyName);
+	}
 
 }

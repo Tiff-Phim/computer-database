@@ -16,4 +16,9 @@ public class CompanyBLOImpl implements CompanyBLO {
 		return companyDAO.findAllCompanies();
 	}
 
+	@Override
+	public Company getCompanyByName(String companyName) throws SQLException {
+		return companyDAO.findCompanyByName(companyName);
+	}
+
 }

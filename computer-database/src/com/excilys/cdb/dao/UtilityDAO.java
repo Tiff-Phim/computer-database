@@ -14,13 +14,14 @@ import java.util.logging.Logger;
  * @version 0.1
  */
 public final class UtilityDAO {
-	
+
 	private static final String FAIL_CLOSE_CONNECTION = "Echec de la fermeture de la connexion.";
 	private static final String FAIL_CLOSE_STATEMENT = "Echec de la fermeture du Statement.";
 	private static final String FAIL_CLOSE_RESULTSET = "Echec de la fermeture du ResultSet.";
 	
 	protected static final String FAIL_FIND_OBJECT = "Echec de la recherche de l'objet.";
 	protected static final String FAIL_FIND_OBJECT_BY_ID = "Echec de la recherche de l'objet par id.";
+	protected static final String FAIL_FIND_OBJECT_BY_NAME = "Echec de la recherche de l'objet par nom.";
 	
 	private static Logger logger = Logger.getLogger(UtilityDAO.class.getName());
 
@@ -32,6 +33,22 @@ public final class UtilityDAO {
 	 * @return preparedStatement the initialized prepared statement
 	 */
 	protected static String initializationPreparedStatement(String sql, Object... objects) {
+		String[] listeSQL = (sql + " ").split("\\?");
+		StringBuilder newSQL = new StringBuilder(listeSQL[0]);
+		for (int i = 0; i < objects.length; i++) {
+			newSQL.append(objects[i] + listeSQL[i + 1]);
+		}
+		return newSQL.toString().replaceAll("\"null\"", "null");
+	}
+	
+	/**
+	 * Initialization of a prepared statement (add "" around objects).
+	 * 
+	 * @param sql the sql request
+	 * @param objects the list of objects to be inserted in the query
+	 * @return preparedStatement the initialized prepared statement
+	 */
+	protected static String initializationPreparedStatementString(String sql, Object... objects) {
 		String[] listeSQL = (sql + " ").split("\\?");
 		StringBuilder newSQL = new StringBuilder(listeSQL[0]);
 		for (int i = 0; i < objects.length; i++) {
@@ -86,9 +103,10 @@ public final class UtilityDAO {
 	}
 	
 	/**
+	 * Closes the statement and connection to database.
 	 * 
-	 * @param statement
-	 * @param connection
+	 * @param statement to close
+	 * @param connection to close
 	 */
 	protected static void close(Statement statement, Connection connection) {
 		close(statement);
@@ -96,10 +114,11 @@ public final class UtilityDAO {
 	}
 	
 	/**
+	 * Closes the resultSet, statement and connection to database.
 	 * 
-	 * @param resultSet
-	 * @param statement
-	 * @param connection
+	 * @param resultSet to close
+	 * @param statement to close
+	 * @param connection to close
 	 */
 	protected static void close(ResultSet resultSet, Statement statement, Connection connection) {
 		close(resultSet);

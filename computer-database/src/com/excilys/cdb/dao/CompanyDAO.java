@@ -7,6 +7,7 @@ import com.excilys.cdb.model.Company;
 
 public interface CompanyDAO {
 
-	public List<Company> findAllCompanies() throws SQLException ;
+	List<Company> findAllCompanies() throws SQLException;
+	Company findCompanyByName(String companyName) throws SQLException;
 	
 }

@@ -7,6 +7,7 @@ import com.excilys.cdb.model.Company;
 
 public interface CompanyBLO {
 
-	public List<Company> getAllCompany()  throws SQLException;
+	List<Company> getAllCompany()  throws SQLException;
+	Company getCompanyByName(String companyName) throws SQLException;
 	
 }

@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,8 +21,8 @@ public class ComputerDAOImpl implements ComputerDAO {
 	private static final String ATTRIBUT_COMPANY_ID = "company_id";
 
 	private static final String SQL_GET_ALL_COMPUTERS = "SELECT * FROM computer";
-	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT (computer.id, computer.name, computer.introduced, computer.discontinued, computer.company_id)"
-			+ "FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
+	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued, computer.company_id"
+			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
 	private static final String SQL_CREATE_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?, ?, ?, ?)";
 	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET company_id=? WHERE computer.id=?";
 	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id=?";
@@ -42,10 +41,10 @@ public class ComputerDAOImpl implements ComputerDAO {
 		Computer computer = new Computer();
 		computer.setId(resultSet.getInt(ATTRIBUT_ID));
 		computer.setName(resultSet.getString(ATTRIBUT_NAME));
-		if (!resultSet.getString(ATTRIBUT_INTRODUCED).isEmpty() || !resultSet.getString(ATTRIBUT_DISCONTINUED).isEmpty()) {
-			//TODO
-			computer.setIntroduced(LocalDate.parse(resultSet.getString(ATTRIBUT_INTRODUCED)));
-			computer.setDiscontinued(LocalDate.parse(resultSet.getString(ATTRIBUT_DISCONTINUED)));
+		if ((resultSet.getString(ATTRIBUT_INTRODUCED) != null)
+				&& (resultSet.getString(ATTRIBUT_DISCONTINUED) != null)) {
+			computer.setIntroduced(resultSet.getTimestamp(ATTRIBUT_INTRODUCED).toLocalDateTime().toLocalDate());
+			computer.setDiscontinued(resultSet.getTimestamp(ATTRIBUT_DISCONTINUED).toLocalDateTime().toLocalDate());
 		}
 		computer.setCompanyId(resultSet.getInt(ATTRIBUT_COMPANY_ID));
 		return computer;
@@ -81,7 +80,7 @@ public class ComputerDAOImpl implements ComputerDAO {
 		try {
 			connection = DBConnection.getInstance().getConnection();
 			preparedStatement = connection.prepareStatement(
-					UtilityDAO.initializationPreparedStatement(SQL_GET_COMPUTER_BY_ID, String.valueOf(computerId)),
+					UtilityDAO.initializationPreparedStatement(SQL_GET_COMPUTER_BY_ID, computerId),
 					Statement.RETURN_GENERATED_KEYS);
 			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
@@ -150,5 +149,5 @@ public class ComputerDAOImpl implements ComputerDAO {
 			UtilityDAO.close(preparedStatement, connection);
 		}
 	}
-	
+
 }

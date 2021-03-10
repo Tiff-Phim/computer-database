@@ -1,6 +1,7 @@
 package com.excilys.cdb.model;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Computer class defines a computer object, name, date when it was introduced
@@ -84,8 +85,8 @@ public class Computer {
 	 * 
 	 * @return introduced date of introduction
 	 */
-	public LocalDate getIntroduced() {
-		return introduced;
+	public Optional<LocalDate> getIntroduced() {
+		return Optional.ofNullable(introduced);
 	}
 
 	/**
@@ -102,8 +103,8 @@ public class Computer {
 	 * 
 	 * @return discontinued date the computer was discontinued
 	 */
-	public LocalDate getDiscontinued() {
-		return discontinued;
+	public Optional<LocalDate> getDiscontinued() {
+		return Optional.ofNullable(discontinued);
 	}
 
 	/**
