@@ -37,6 +37,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 		return company;
 	}
 
+	/**
+	 * Lists all companies present in database.
+	 * 
+	 * @return companies all the companies stored in database
+	 * @throws SQLException
+	 */
 	@Override
 	public List<Company> findAllCompanies() throws SQLException {
 		Connection connection = null;
@@ -58,6 +64,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 		return companyList;
 	}
 
+	/**
+	 * Show details for the company selected with its name.
+	 * 
+	 * @return company details
+	 * @throws SQLException
+	 */
 	@Override
 	public Company findCompanyByName(String companyName) throws SQLException {
 		Connection connection = null;

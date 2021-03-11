@@ -50,6 +50,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 		return computer;
 	}
 
+	/**
+	 * Lists all computers present in database.
+	 * 
+	 * @return computers all the computers stored in database
+	 * @throws SQLException
+	 */
 	@Override
 	public List<Computer> findAllComputers() {
 		Connection connection = null;
@@ -71,6 +77,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 		return computerList;
 	}
 
+	/**
+	 * Find a computer by its id.
+	 * 
+	 * @return computer details
+	 * @throws SQLException
+	 */
 	@Override
 	public Computer findComputerById(long computerId) {
 		Connection connection = null;
@@ -93,6 +105,11 @@ public class ComputerDAOImpl implements ComputerDAO {
 		return computer;
 	}
 
+	/**
+	 * Creates a new computer and store it in the database.
+	 * 
+	 * @throws SQLException
+	 */
 	@Override
 	public void createComputer(Computer computer) {
 		if (computer != null) {
@@ -112,6 +129,13 @@ public class ComputerDAOImpl implements ComputerDAO {
 		}
 	}
 
+	/**
+	 * Updates a computer identified by its id.
+	 * 
+	 * @param computer the updated computer
+	 * @param computerId the id of the computer to update
+	 * @throws SQLException
+	 */
 	@Override
 	public void updateComputerById(Computer computer, long computerId) {
 		Connection connection = null;
@@ -130,6 +154,12 @@ public class ComputerDAOImpl implements ComputerDAO {
 		}
 	}
 
+	/**
+	 * Deletes a computer by specifying its id.
+	 * 
+	 * @param computerId the id of the computer to delete
+	 * @throws SQLException
+	 */
 	@Override
 	public void deleteComputerById(long computerId) {
 		Connection connection = null;

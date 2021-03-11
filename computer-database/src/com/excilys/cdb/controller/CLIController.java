@@ -16,6 +16,12 @@ public class CLIController {
 
 	private Scanner sc = new Scanner(System.in);
 
+	
+	/**
+	 * Run CLIController.
+	 * 
+	 * @throws SQLException
+	 */
 	public void run() throws SQLException {
 		while (true) {
 			displayMenu();
@@ -24,6 +30,9 @@ public class CLIController {
 		}
 	}
 
+	/**
+	 * Display the menu with its options.
+	 */
 	private void displayMenu() {
 		System.out.println("Welcome to Computer-database CLI");
 		System.out.println("Please choose and enter command number");

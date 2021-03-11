@@ -34,7 +34,7 @@ public class Company {
 	 * @param id of the company
 	 * @param name of the company
 	 */
-	public Company(int id, String name) {
+	public Company(long id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -85,4 +85,5 @@ public class Company {
 	public String toString() {
 		return "Company [id=" + id + ", name=" + name + "]";
 	}
+	
 }
