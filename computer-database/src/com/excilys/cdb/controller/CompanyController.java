@@ -2,21 +2,21 @@ package com.excilys.cdb.controller;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
-import com.excilys.cdb.blo.CompanyBLO;
-import com.excilys.cdb.blo.CompanyBLOImpl;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.service.CompanyService;
 
 public class CompanyController {
 	
-	CompanyBLO companyBLOService = new CompanyBLOImpl();
+	CompanyService companyService = new CompanyService();
 	
-	public List<Company> getAll() throws SQLException {
-		return companyBLOService.getAllCompany();
+	public List<Optional<Company>> getAll() throws SQLException {
+		return companyService.getAllCompany();
 	}
 	
-	public Company getCompanyByName(String companyName) throws SQLException {
-		return companyBLOService.getCompanyByName(companyName);
+	public Optional<Company> getCompanyByName(String companyName) throws SQLException {
+		return companyService.getCompanyByName(companyName);
 	}
 
 }

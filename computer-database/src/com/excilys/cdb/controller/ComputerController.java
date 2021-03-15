@@ -2,33 +2,33 @@ package com.excilys.cdb.controller;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
-import com.excilys.cdb.blo.ComputerBLO;
-import com.excilys.cdb.blo.ComputerBLOImpl;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.service.ComputerService;
 
 public class ComputerController {
 
-	ComputerBLO computerBLOService = new ComputerBLOImpl();
+	ComputerService computerService = new ComputerService();
 	
-	public List<Computer> getAll() throws SQLException {
-		return computerBLOService.getInfoComputer();
+	public List<Optional<Computer>> getAll() throws SQLException {
+		return computerService.getInfoComputer();
 	}
 	
-	public Computer getComputerById(long id) {
-		return computerBLOService.getComputerById(id);
+	public Optional<Computer> getComputerById(long id) {
+		return computerService.getComputerById(id);
 	}
 	
 	public void insertComputer(Computer computer) {
-		computerBLOService.addComputer(computer);
+		computerService.addComputer(computer);
 	}
 	
 	public void updateComputer(Computer computer, long id) {
-		computerBLOService.updateComputer(computer, id);
+		computerService.updateComputer(computer, id);
 	}
 	
 	public void deleteComputer(long id) {
-		computerBLOService.deleteComputer(id);
+		computerService.deleteComputer(id);
 	}
 	
 }

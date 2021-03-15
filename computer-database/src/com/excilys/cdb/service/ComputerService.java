@@ -1,38 +1,34 @@
-package com.excilys.cdb.blo;
+package com.excilys.cdb.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.excilys.cdb.dao.ComputerDAO;
-import com.excilys.cdb.dao.ComputerDAOImpl;
 import com.excilys.cdb.model.Computer;
 
-public class ComputerBLOImpl implements ComputerBLO {
+public class ComputerService {
 
-	ComputerDAO computerDAO = new ComputerDAOImpl();
+	ComputerDAO computerDAO = new ComputerDAO();
 	
-	@Override
-	public List<Computer> getInfoComputer() {
+	public List<Optional<Computer>> getInfoComputer() {
 		return computerDAO.findAllComputers();
 	}
 
-	@Override
-	public Computer getComputerById(long id) {
+	public Optional<Computer> getComputerById(long id) {
 		return computerDAO.findComputerById(id);
 	}
 
-	@Override
 	public void addComputer(Computer computer) {
 		computerDAO.createComputer(computer);
 	}
 
-	@Override
 	public void updateComputer(Computer computer, long id) {
 		computerDAO.updateComputerById(computer, id);		
 	}
 
-	@Override
 	public void deleteComputer(long id) {
 		computerDAO.deleteComputerById(id);
 	}
 
 }
+

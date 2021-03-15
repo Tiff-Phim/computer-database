@@ -1,11 +1,8 @@
 package com.excilys.cdb.controller;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
-
-import com.excilys.cdb.model.Computer;
 
 public class CLIController {
 	
@@ -59,13 +56,13 @@ public class CLIController {
 			System.out.println(computerController.getComputerById(id));
 			break;
 		case 4:
-			computerController.insertComputer(updateComputer());
+//			computerController.insertComputer(updateComputer());
 			System.out.println("Computer added to database.");
 			break;
 		case 5:
 			System.out.println("Which computer do you want to update ? Enter it's id...");
 			long computerId = sc.nextLong();
-			computerController.updateComputer(updateComputer(), computerId);
+//			computerController.updateComputer(updateComputer(), computerId);
 			System.out.println("Computer updated.");
 			break;
 		case 6:
@@ -90,24 +87,25 @@ public class CLIController {
 	 * @return computer to update or create
 	 * @throws SQLException
 	 */
-	private Computer updateComputer() throws SQLException {
-		Computer computer = new Computer();
-		System.out.println("Please enter company name :");
-		sc.nextLine();
-		String name = sc.nextLine();
-		computer.setCompanyId(companyController.getCompanyByName(name).getId());
-		System.out.println("Please enter computer name :");
-		String computerName = sc.nextLine();
-		computer.setName(computerName);
-		System.out.println("Please enter computer introduced date with the following format: yyyy-MM-dd");
-		String introduced = sc.nextLine();
-		computer.setIntroduced(LocalDate.parse(introduced, dtf));
-		System.out.println("Please enter computer discontinued date with the following format: yyyy-MM-dd");
-		String discontinued = sc.nextLine();
-		if (!discontinued.isEmpty()) {
-			computer.setIntroduced(LocalDate.parse(discontinued, dtf));
-		}
-		return computer;
-	}
+//	private Computer updateComputer() throws SQLException {
+////		Computer computer = new Computer();
+//		System.out.println("Please enter company name :");
+//		sc.nextLine();
+//		String name = sc.nextLine();
+////		computer.setCompanyId(companyController.getCompanyByName(name));
+//		//TODO
+//		System.out.println("Please enter computer name :");
+//		String computerName = sc.nextLine();
+//		computer.setName(computerName);
+//		System.out.println("Please enter computer introduced date with the following format: yyyy-MM-dd");
+//		String introduced = sc.nextLine();
+//		computer.setIntroduced(LocalDate.parse(introduced, dtf));
+//		System.out.println("Please enter computer discontinued date with the following format: yyyy-MM-dd");
+//		String discontinued = sc.nextLine();
+//		if (!discontinued.isEmpty()) {
+//			computer.setIntroduced(LocalDate.parse(discontinued, dtf));
+//		}
+//		return computer;
+//	}
 
 }
