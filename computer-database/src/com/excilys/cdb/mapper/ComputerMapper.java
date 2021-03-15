@@ -1,7 +1,9 @@
 package com.excilys.cdb.mapper;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import com.excilys.cdb.model.Company;
@@ -30,11 +32,19 @@ public class ComputerMapper {
 		
 		Computer computer = new Computer.ComputerBuilder().setId(resultSet.getLong(ATTRIBUT_ID))
 				.setName(resultSet.getString(ATTRIBUT_COMPUTER_NAME))
-				.setIntroduced(resultSet.getDate(ATTRIBUT_INTRODUCED).toLocalDate())
-				.setDiscontinued(resultSet.getDate(ATTRIBUT_DISCONTINUED).toLocalDate())
+				.setIntroduced(convertToLocalDate(resultSet.getDate(ATTRIBUT_INTRODUCED)))
+				.setDiscontinued(convertToLocalDate(resultSet.getDate(ATTRIBUT_DISCONTINUED)))
 				.setCompany(company).build();
 		
 		return Optional.ofNullable(computer);
+	}
+	
+	private LocalDate convertToLocalDate(Date date) {
+		LocalDate localDate = null;
+		if (date != null) {
+			localDate = date.toLocalDate();
+		}
+		return localDate;
 	}
 	
 }

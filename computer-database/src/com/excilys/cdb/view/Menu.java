@@ -1,77 +1,94 @@
 package com.excilys.cdb.view;
 
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 
 public class Menu {
 
+	private static final String START_LINE = ">>";
+	private static final String VERTICAL_SEP = "";
+	private static final String WELCOME_MESSAGE = "Welcome to Computer-database CLI";
+	private static final String CHOOSE_ACTION_MESSAGE = "Please choose and enter command number";
+
 	enum MenuCommand {
-		LIST_ALL_COMPUTER(1),
-		LIST_ALL_COMPANY(2),
-		SHOW_COMPUTER_DETAIL(3),
-		ADD_NEW_COMPUTER(4),
-		UPDATE_COMPUTER(5),
-		DELETE_COMPUTER(6),
-		QUIT_CLI(0);
-		
-		private int value;
-		
-		MenuCommand(int value) {
+		LIST_ALL_COMPUTER(1, "List all computers."), LIST_ALL_COMPANY(2, "List all companies."), SHOW_COMPUTER_DETAIL(3,
+				"Show computer details."), ADD_NEW_COMPUTER(4, "Add new computer."), UPDATE_COMPUTER(5,
+						"Update a computer."), DELETE_COMPUTER(6, "Delete a computer."), QUIT_CLI(0, "Quit.");
+
+		public final int value;
+		public final String description;
+
+		MenuCommand(int value, String description) {
 			this.value = value;
-		}
-		
-		public int getValue() {
-			return value;
+			this.description = description;
 		}
 	}
-	
-	private void processCommand(MenuCommand command) throws SQLException {
-		switch (command) {
-		case LIST_ALL_COMPUTER:
-//			System.out.println(computerController.getAll().toString());
-			break;
-		case LIST_ALL_COMPANY:
-//			System.out.println(companyController.getAll().toString());
-			break;
-		case SHOW_COMPUTER_DETAIL:
-			System.out.println("Please enter an id.");
-//			long id = sc.nextLong();
-//			System.out.println(computerController.getComputerById(id));
-			break;
-		case ADD_NEW_COMPUTER:
-//			computerController.insertComputer(updateComputer());
-			System.out.println("Computer added to database.");
-			break;
-		case UPDATE_COMPUTER:
-			System.out.println("Which computer do you want to update ? Enter it's id...");
-//			long computerId = sc.nextLong();
-//			computerController.updateComputer(updateComputer(), computerId);
-			System.out.println("Computer updated.");
-			break;
-		case DELETE_COMPUTER:
-//			sc.nextLine();
-			System.out.println("Which computer do you want to delete ? Enter it's id...");
-//			long computerIdToDelete = sc.nextLong();
-//			computerController.deleteComputer(computerIdToDelete);
-			System.out.println("Computer deleted.");
-			break;
-		case QUIT_CLI:
-			System.out.println("Bye");
-//			sc.close();
-			System.exit(0);
-		default:
-			System.out.println("Unknown command. Please enter a valid command.");
+
+	public void showMenu() {
+		System.out.println(WELCOME_MESSAGE);
+		System.out.println(CHOOSE_ACTION_MESSAGE);
+		CLITable st = new CLITable();
+		st.setShowVerticalLines(true);
+		st.setHeaders("Value", "Description");
+		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPUTER.value), MenuCommand.LIST_ALL_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPANY.value), MenuCommand.LIST_ALL_COMPANY.description);
+		st.addRow(String.valueOf(MenuCommand.SHOW_COMPUTER_DETAIL.value), MenuCommand.SHOW_COMPUTER_DETAIL.description);
+		st.addRow(String.valueOf(MenuCommand.ADD_NEW_COMPUTER.value), MenuCommand.ADD_NEW_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.UPDATE_COMPUTER.value), MenuCommand.UPDATE_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.DELETE_COMPUTER.value), MenuCommand.DELETE_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.QUIT_CLI.value), MenuCommand.QUIT_CLI.description);
+		st.print();
+	}
+
+	public void showCompanies(List<Optional<Company>> list) {
+		CLITable st = new CLITable();
+		st.setShowVerticalLines(true);
+		st.setHeaders("Id", "Name");
+		for (Optional<Company> company : list) {
+			if (company.isPresent()) {
+				st.addRow(String.valueOf(company.get().getId()), company.get().getName());
+			}
 		}
+		st.print();
 	}
-	
-	private void displayMenu() {
-		System.out.println("Welcome to Computer-database CLI");
-		System.out.println("Please choose and enter command number");
-		System.out.println("1-List the computers stored in the database");
-		System.out.println("2-List the companies stored in the database");
-		System.out.println("3-Show details for the selected computer");
-		System.out.println("4-Add a new computer to the database");
-		System.out.println("5-Update the selected computer");
-		System.out.println("6-Delete the selected computer");
-		System.out.println("0-Quit the computer-database CLI");
+
+	public void showComputers(List<Optional<Computer>> list) {
+		CLITable st = new CLITable();
+		st.setShowVerticalLines(true);
+		st.setHeaders("Id", "Name", "Introduced date", "Discontinued date", "Company name");
+		for (Optional<Computer> computer : list) {
+			if (computer.isPresent()) {
+				String companyName = "Unknow";
+				if (computer.get().getCompany().getId() != 0l) {
+					companyName = computer.get().getCompany().getName();
+				}
+				st.addRow(String.valueOf(computer.get().getId()), computer.get().getName(),
+						String.valueOf(computer.get().getIntroduced()),
+						String.valueOf(computer.get().getDiscontinued()), companyName);
+			}
+		}
+		st.print();
 	}
+
+	public void showComputerDetails(Optional<Computer> computer) {
+		CLITable st = new CLITable();
+		st.setShowVerticalLines(true);
+		st.setHeaders("Id", "Name", "Introduced date", "Discontinued date", "Company name");
+		if (computer.isPresent()) {
+			st.addRow(String.valueOf(computer.get().getId()), computer.get().getName(),
+					String.valueOf(computer.get().getIntroduced()), String.valueOf(computer.get().getDiscontinued()),
+					computer.get().getCompany().getName());
+		}
+		st.print();
+	}
+
+	public void printElement(String element) {
+		System.out.println(VERTICAL_SEP);
+		System.out.println(element);
+		System.out.println(START_LINE);
+	}
+
 }

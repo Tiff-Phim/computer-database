@@ -1,6 +1,8 @@
 package com.excilys.cdb.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Page<E> class defines a page object.
@@ -8,7 +10,7 @@ import java.util.List;
  * @author Tiffany PHIMMASANE
  * @version 0.1
  *
- * @param <E>
+ * @param <E> element
  */
 public class Page<E> {
 
@@ -19,7 +21,7 @@ public class Page<E> {
 	private int size;
 	private int number;
 	private SortingOrder order;
-	private List<E> content;
+	private List<Optional<E>> content;
 	private Page<E> nextPage;
 	private Page<E> previousPage;
 	
@@ -28,25 +30,30 @@ public class Page<E> {
 		DESC
 	}
 	
-	public Page(int size, int number, SortingOrder order, List<E> content, Page<E> nextPage, Page<E> previousPage) {
-		super();
+	public Page(int size, int number) {
+		content = new ArrayList<>();
 		this.size = size;
 		this.number = number;
-		this.order = order;
-		this.content = content;
-		this.nextPage = nextPage;
-		this.previousPage = previousPage;
 	}
 	
-	public Page(List<E> content, Page<E> nextPage, Page<E> previousPage) {
-		super();
-		this.size = DEFAULT_PAGE_SIZE;
-		this.number = DEFAULT_PAGE_NUMBER;
-		this.order = DEFAULT_SORTING_ORDER;
-		this.content = content;
-		this.nextPage = nextPage;
-		this.previousPage = previousPage;
-	}
+//	public Page(int size, int number, SortingOrder order, List<E> content, Page<E> nextPage, Page<E> previousPage) {
+//		this.size = size;
+//		this.number = number;
+//		this.order = order;
+//		this.content = content;
+//		this.nextPage = nextPage;
+//		this.previousPage = previousPage;
+//	}
+	
+//	public Page(List<E> content, Page<E> nextPage, Page<E> previousPage) {
+//		super();
+//		this.size = DEFAULT_PAGE_SIZE;
+//		this.number = DEFAULT_PAGE_NUMBER;
+//		this.order = DEFAULT_SORTING_ORDER;
+//		this.content = content;
+//		this.nextPage = nextPage;
+//		this.previousPage = previousPage;
+//	}
 
 	public int getSize() {
 		return size;
@@ -72,11 +79,11 @@ public class Page<E> {
 		this.order = order;
 	}
 	
-	public List<E> getContent() {
+	public List<Optional<E>> getContent() {
 		return content;
 	}
 	
-	public void setContent(List<E> content) {
+	public void setContent(List<Optional<E>> content) {
 		this.content = content;
 	}
 	

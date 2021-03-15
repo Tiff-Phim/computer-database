@@ -5,32 +5,35 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Page;
 
 public class ComputerDAO {
 
-	private static final String SQL_GET_ALL_COMPUTERS = "SELECT id, name, introduced, discontinued, company_id FROM computer";
-	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued, computer.company_id"
-			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
+	private static final String SQL_GET_ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
+			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id";
+	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
+			+" computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
 	private static final String SQL_CREATE_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?, ?, ?, ?)";
-//	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET company_id=? WHERE computer.id=?"; //TODO
 	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET computer.name=?, computer.introduced=?, computer.discontinued=?"
 			+ ", computer.company_id=? WHERE computer.id=?";
 	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id=?";
 
-	private static Logger logger = Logger.getLogger(ComputerDAO.class.getName());
+	private static Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-	private DBConnection dbConnection = DBConnection.getInstance();
-	private static ComputerMapper mapper;
+	private static DBConnection dbConnection = DBConnection.getInstance();
+	private static ComputerMapper mapper = new ComputerMapper();
 
 	/**
 	 * Lists all computers present in database.
@@ -41,16 +44,48 @@ public class ComputerDAO {
 	public List<Optional<Computer>> findAllComputers() {
 		List<Optional<Computer>> computerList = new ArrayList<>();
 		try (Connection connection = dbConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_ALL_COMPUTERS)) {
-			ResultSet resultSet = preparedStatement.executeQuery();
+				Statement statement = connection.createStatement()) {
+			ResultSet resultSet = statement.executeQuery(SQL_GET_ALL_COMPUTERS);
 			while (resultSet.next()) {
 				computerList.add(mapper.mapToComputer(resultSet));
 			}
 		} catch (SQLException e) {
-//			logger.log(Level.WARNING, UtilityDAO.FAIL_FIND_OBJECT, e);
+			logger.warn("UtilityDAO.FAIL_FIND_OBJECT", e); //TODO change log message
 		}
 		return computerList;
 	}
+	
+	
+	private static final String GET_PAGE_QUERY = "SELECT computer.id, computer.name,"
+			+ " company.name, computer.introduced, computer.discontinued,"
+			+ " computer.company_id FROM computer LEFT JOIN company "
+			+ "ON company.id = computer.company_id ORDER BY SORT_ATTRIBUTE SORT_ORDER LIMIT ? OFFSET ?";
+	
+	/**
+	 * TODO add description
+	 * @param page
+	 * @return
+	 */
+//	public Page<Computer> getComputerPaginated(Page<Computer> page) {
+//		List<Optional<Computer>> computerList = new ArrayList<>();
+//		try (Connection connection = dbConnection.getConnection();
+//				PreparedStatement preparedStatement = connection
+//						.prepareStatement(GET_PAGE_QUERY.replaceFirst("SORT_ORDER", page.getSortOrder().name())
+//								.replaceFirst("SORT_ATTRIBUTE", page.getSortName().getAttribute()))) {
+//			preparedStatement.setInt(1, page.getSize());
+//			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
+//			ResultSet resultSet = preparedStatement.executeQuery();
+////			page.setContent(convertToListComputerList(resultSet));
+//			
+//			while (resultSet.next()) {
+//				computerList.add(mapper.mapToComputer(resultSet));
+//				page.setContent(computerList);
+//			}
+//		} catch (SQLException e) {
+//			logger.warn(""); //TODO
+//		}
+//		return page;
+//	}
 
 	/**
 	 * Find a computer by its id.
@@ -81,10 +116,19 @@ public class ComputerDAO {
 		if (computer != null) {
 			try (Connection connection = dbConnection.getConnection();
 					PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_COMPUTER)) {
-				initPreparedStatement(preparedStatement, computer);
+				initPreparedStatement(preparedStatement, computer);				
+				preparedStatement.setString(1, computer.getName());
+				preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
+				preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
+				
+				if (computer.getCompany().getId() != 0l) {
+					preparedStatement.setLong(4, computer.getCompany().getId());
+				} else {
+					preparedStatement.setString(4, null);
+				}
 				preparedStatement.executeUpdate();
 			} catch (SQLException e) {
-				logger.log(Level.WARNING, "Échec de la création de l'objet, aucune ligne ajoutée dans la table.", e);
+				logger.warn("Échec de la création de l'objet, aucune ligne ajoutée dans la table.", e);
 			}
 		}
 	}
@@ -99,11 +143,19 @@ public class ComputerDAO {
 	public void updateComputerById(Computer computer, long computerId) {
 		try (Connection connection = dbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_COMPUTER_BY_ID)) {
-			// TODO
-
+			preparedStatement.setString(1, computer.getName());
+			preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
+			preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
+			
+			if (computer.getCompany().getId() != 0l) {
+				preparedStatement.setLong(4, computer.getCompany().getId());
+			} else {
+				preparedStatement.setString(4, null);
+			}
+			preparedStatement.setLong(5, computerId);
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
-			logger.log(Level.WARNING, "ECHEC_MODIFICATION_OBJET");
+			logger.warn("ECHEC_MODIFICATION_OBJET");
 		}
 	}
 
@@ -122,7 +174,7 @@ public class ComputerDAO {
 				throw new SQLException();
 			}
 		} catch (SQLException e) {
-			logger.log(Level.WARNING, "ECHEC_SUPPRESSION_OBJET");
+			logger.warn("ECHEC_SUPPRESSION_OBJET");
 		}
 	}
 
