@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.excilys.cdb.dao.ComputerDAO;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Page;
 
 public class ComputerService {
 
@@ -13,9 +14,17 @@ public class ComputerService {
 	public List<Optional<Computer>> getInfoComputer() {
 		return computerDAO.findAllComputers();
 	}
+	
+	public Page<Computer> getComputerPaginated(Page<Computer> page) {
+		return computerDAO.getComputerPaginated(page);
+	}
 
 	public Optional<Computer> getComputerById(long id) {
 		return computerDAO.findComputerById(id);
+	}
+	
+	public Optional<Computer> getComputerByName(String name) {
+		return computerDAO.findComputerByName(name);
 	}
 
 	public void addComputer(Computer computer) {

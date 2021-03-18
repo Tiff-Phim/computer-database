@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.excilys.cdb.dao.CompanyDAO;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Page;
 
 public class CompanyService {
 
@@ -13,6 +14,10 @@ public class CompanyService {
 	
 	public List<Optional<Company>> getAllCompany() throws SQLException {
 		return companyDAO.findAllCompanies();
+	}
+	
+	public Page<Company> getCompanyPaginated(Page<Company> page) throws SQLException {
+		return companyDAO.getCompanyPaginated(page);
 	}
 
 	public Optional<Company> getCompanyByName(String companyName) throws SQLException {
