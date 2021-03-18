@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Page;
 import com.excilys.cdb.service.ComputerService;
 
 public class ComputerController {
@@ -13,6 +14,10 @@ public class ComputerController {
 	
 	public List<Optional<Computer>> getAll() throws SQLException {
 		return computerService.getInfoComputer();
+	}
+	
+	public Page<Computer> getComputerPaginated(Page<Computer> page) throws SQLException {
+		return computerService.getComputerPaginated(page);
 	}
 	
 	public Optional<Computer> getComputerById(long id) {
