@@ -7,11 +7,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * DBConnection class defines a single connection to the database.
  * 
  * @author Tiffany PHIMMASANE
- * @version 0.1
+ * @version 0.2
  */
 public class DBConnection {
 	
@@ -19,10 +22,12 @@ public class DBConnection {
 	private static final String PROPERTY_URL = "db.url";
 	private static final String PROPERTY_USER = "db.user";
 	private static final String PROPERTY_PASSWORD = "db.password";
+	private static final String PROPERTY_DRIVER = "db.driver";
 
 	private static DBConnection instance = new DBConnection();
+	private static Logger logger = LoggerFactory.getLogger(DBConnection.class);
 
-	private String url, user, pw;
+	private String driver, url, user, pw;
 
 	/**
 	 * Default DBConnection constructor.
@@ -32,10 +37,15 @@ public class DBConnection {
 			Properties prop = new Properties();
 			InputStream stream = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE_NAME);
 			prop.load(stream);
+			this.driver = prop.getProperty(PROPERTY_DRIVER);
+			Class.forName(driver);
 			this.url = prop.getProperty(PROPERTY_URL);
 			this.user = prop.getProperty(PROPERTY_USER);
 			this.pw = prop.getProperty(PROPERTY_PASSWORD);
 		} catch (IOException e) {
+			logger.error("");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

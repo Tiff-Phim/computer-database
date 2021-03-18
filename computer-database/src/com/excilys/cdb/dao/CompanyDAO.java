@@ -37,13 +37,14 @@ public class CompanyDAO {
 		List<Optional<Company>> companyList = new ArrayList<>();
 		try (Connection con = dbConnection.getConnection();
 				Statement statement = con.createStatement()) {
+			logger.debug("CompanyDAO: getting all companies ...");
 			ResultSet results = null;
 			results = statement.executeQuery(SQL_GET_ALL_COMPANIES);
 			while (results.next()) {
 				companyList.add(mapper.mapToCompany(results));
 			}
 		} catch (SQLException e) {
-			logger.warn("UtilityDAO.FAIL_FIND_OBJECT", e); //TODO change message
+			logger.error("Error occur in ComputerDAO, could not get companies.", e);
 		}
 		return companyList;
 	}
@@ -58,12 +59,13 @@ public class CompanyDAO {
 		Optional<Company> company = Optional.empty();
 		try (Connection connection = dbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_BY_NAME)) {
+			logger.debug("CompanyDAO: getting company by name ...");
 			preparedStatement.setString(1, companyName);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			company = mapper.mapToCompany(resultSet);
 		} catch (SQLException e) {
-			logger.warn("UtilityDAO.FAIL_FIND_OBJECT_BY_NAME", e);//TODO change message
+			logger.error("Error occur in ComputerDAO, could not get company by name.", e);
 		}
 		return company;
 	}
@@ -78,6 +80,7 @@ public class CompanyDAO {
 		ArrayList<Optional<Company>> companyList = new ArrayList<>();
 		try (Connection connection = dbConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMAPNY_PAGE)) {
+			logger.debug("CompanyDAO: getting company by page ...");
 			preparedStatement.setInt(1, page.getSize());
 			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -86,7 +89,7 @@ public class CompanyDAO {
 				page.setContent(companyList);
 			}
 		} catch (SQLException e) {
-			logger.warn(""); //TODO
+			logger.error("Error occur in ComputerDAO, could not get company pages.", e);
 		}
 		return page;
 	}
