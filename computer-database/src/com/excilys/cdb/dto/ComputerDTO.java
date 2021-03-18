@@ -16,6 +16,14 @@ public class ComputerDTO {
 		this.companyName = companyName;
 	}
 
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -46,14 +54,6 @@ public class ComputerDTO {
 
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 	
 }
