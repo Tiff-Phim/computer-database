@@ -23,7 +23,7 @@ public class ComputerDAO {
 
 	private static final String SQL_GET_ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
 			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id";
-	private static final String GET_PAGE_QUERY = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued,"
+	private static final String SQL_GET_PAGE = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued,"
 			+ " computer.company_id FROM computer LEFT JOIN company ON company.id = computer.company_id ORDER BY SORT_BY SORT_ORDER LIMIT ? OFFSET ?";
 	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
 			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
@@ -69,7 +69,7 @@ public class ComputerDAO {
 		List<Optional<Computer>> computerList = new ArrayList<>();
 		try (Connection connection = dbConnection.getConnection();
 				PreparedStatement preparedStatement = connection
-						.prepareStatement(GET_PAGE_QUERY.replaceFirst("SORT_ORDER", page.getOrder().name())
+						.prepareStatement(SQL_GET_PAGE.replaceFirst("SORT_ORDER", page.getOrder().name())
 								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
 			logger.debug("ComputerDAO: getting all computers paginated ...");
 			preparedStatement.setInt(1, page.getSize());
