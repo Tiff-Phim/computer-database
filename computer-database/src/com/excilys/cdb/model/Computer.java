@@ -174,7 +174,7 @@ public class Computer {
 		}
 		
 	}
-	
+
 	/**
 	 * Generates a textual representation of a Computer object.
 	 * 
@@ -182,8 +182,8 @@ public class Computer {
 	 */
 	@Override
 	public String toString() {
-		return "Computer [name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
-				+ ", companyId=" + company + "]";
+		return "Computer [id=" + id + ", name=" + name + ", introduced=" + introduced + ", discontinued=" + discontinued
+				+ ", company=" + company + "]";
 	}
 
 	@Override
