@@ -1,10 +1,12 @@
 package com.excilys.cdb.view;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Page;
 
 public class Menu {
 
@@ -13,20 +15,6 @@ public class Menu {
 	private static final String WELCOME_MESSAGE = "Welcome to Computer-database CLI";
 	private static final String CHOOSE_ACTION_MESSAGE = "Please choose and enter command number";
 
-	enum MenuCommand {
-		LIST_ALL_COMPUTER(1, "List all computers."), LIST_ALL_COMPANY(2, "List all companies."), SHOW_COMPUTER_DETAIL(3,
-				"Show computer details."), ADD_NEW_COMPUTER(4, "Add new computer."), UPDATE_COMPUTER(5,
-						"Update a computer."), DELETE_COMPUTER(6, "Delete a computer."), QUIT_CLI(0, "Quit.");
-
-		public final int value;
-		public final String description;
-
-		MenuCommand(int value, String description) {
-			this.value = value;
-			this.description = description;
-		}
-	}
-
 	public void showMenu() {
 		System.out.println(WELCOME_MESSAGE);
 		System.out.println(CHOOSE_ACTION_MESSAGE);
@@ -34,7 +22,9 @@ public class Menu {
 		st.setShowVerticalLines(true);
 		st.setHeaders("Value", "Description");
 		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPUTER.value), MenuCommand.LIST_ALL_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.LIST_COMPUTER.value), MenuCommand.LIST_COMPUTER.description);
 		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPANY.value), MenuCommand.LIST_ALL_COMPANY.description);
+		st.addRow(String.valueOf(MenuCommand.LIST_COMPANY.value), MenuCommand.LIST_COMPANY.description);
 		st.addRow(String.valueOf(MenuCommand.SHOW_COMPUTER_DETAIL.value), MenuCommand.SHOW_COMPUTER_DETAIL.description);
 		st.addRow(String.valueOf(MenuCommand.ADD_NEW_COMPUTER.value), MenuCommand.ADD_NEW_COMPUTER.description);
 		st.addRow(String.valueOf(MenuCommand.UPDATE_COMPUTER.value), MenuCommand.UPDATE_COMPUTER.description);
@@ -89,6 +79,20 @@ public class Menu {
 		System.out.println(VERTICAL_SEP);
 		System.out.println(element);
 		System.out.println(START_LINE);
+	}
+	
+	public <E> void showComputerPaginated(Page<E> page) {
+		printPage(page);
+	}
+	
+	private <T> void printPage(Page<T> page) {
+		System.out.println("Printing page ..."); //TODO
+		List<Optional<Computer>> listComputers = new ArrayList<>();
+		for (Optional<T> content : page.getContent()) {
+			Optional<Computer> computer = (Optional<Computer>) Optional.ofNullable(content.get());
+			listComputers.add(computer);
+		}
+		showComputers(listComputers);
 	}
 
 }
