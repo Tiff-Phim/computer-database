@@ -53,7 +53,7 @@ public class DashboardServlet extends HttpServlet {
 
 	private static ComputerMapper mapper = new ComputerMapper();
 	private int pageSize = 10;
-
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -71,9 +71,9 @@ public class DashboardServlet extends HttpServlet {
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		List<ComputerDTO> computers = getComputerList();
-		
 		int pageNumber;
 		int totalPages = computers.size();
+		
 		if (request.getParameter(ATT_PAGE_SIZE) != null) {
 			pageSize = Integer.parseInt(request.getParameter(ATT_PAGE_SIZE));
 		}
@@ -89,10 +89,10 @@ public class DashboardServlet extends HttpServlet {
 		session.setAttribute(ATT_PAGE_TOTAL, String.valueOf(totalPages / pageSize + 1));
 		session.setAttribute(ATT_COMPUTER_LIST, computers);
 		session.setAttribute(ATT_COMPUTER_TOTAL, totalPages);
-		request.setAttribute(ATT_PAGE_NUMBER, pageNumber);
-		request.setAttribute(ATT_COMPUTER_PAGE,
+		session.setAttribute(ATT_PAGE_NUMBER, pageNumber);
+		session.setAttribute(ATT_COMPUTER_PAGE,
 				computerService.getComputerPaginated(new Page<Computer>(pageSize, pageNumber)).getContent());
-		request.setAttribute(ATT_LIST_PAGE_NUMBERS, pageNumbers);
+		session.setAttribute(ATT_LIST_PAGE_NUMBERS, pageNumbers);
 
 		this.getServletContext().getRequestDispatcher(VUE_FORM).forward(request, response);
 	}

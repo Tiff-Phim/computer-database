@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -13,13 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.CompanyDTO;
-import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.servlet.validator.AddComputerValidator;
 
 /**
  * Servlet implementation class AddComputerServlet
@@ -36,6 +38,7 @@ public class AddComputerServlet extends HttpServlet {
 	private static final String ATT_DISCONTINUED_DATE = "discontinued";
 	private static final String ATT_COMPANY_ID = "companyId";
 	private static final String ATT_COMPANY_LIST = "companyList";
+	private static final String ATT_ERRORS = "errors";
 
 	private CompanyService companyService;
 	private ComputerService computerService;
@@ -87,10 +90,16 @@ public class AddComputerServlet extends HttpServlet {
 		String discontinued = request.getParameter(ATT_DISCONTINUED_DATE);
 		String company = request.getParameter(ATT_COMPANY_ID);
 
-		ComputerDTO computer = new ComputerDTO(0, computerName, introduced, discontinued, company);
-		computerService.addComputer(computerMapper.mapToComputer(computer));
+		AddComputerDTO computer = new AddComputerDTO(computerName, introduced, discontinued, company);	
+		AddComputerValidator validator = new AddComputerValidator();
+		Map<String, String> errors = validator.validateComputer(computer);
+		if (errors.isEmpty()) {
+			computerService.addComputer(computerMapper.mapAddComputerDTOToComputer(computer));
+		} else {
+			request.setAttribute(ATT_ERRORS, errors);
+		}
 
-		this.getServletContext().getRequestDispatcher(VUE_FORM).forward(request, response);
+		response.sendRedirect("/computer-database/DashboardServlet");
 	}
 
 }
