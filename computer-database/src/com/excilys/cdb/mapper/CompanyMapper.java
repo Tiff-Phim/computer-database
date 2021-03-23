@@ -5,9 +5,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import com.excilys.cdb.dto.CompanyDTO;
-import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
 
 public class CompanyMapper {
 	

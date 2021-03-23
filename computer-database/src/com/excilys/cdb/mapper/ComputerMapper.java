@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
@@ -56,6 +57,14 @@ public class ComputerMapper {
 					computer.get().getCompany().getName() != null ? computer.get().getCompany().getName() : "Unknown");
 		}
 		return null;
+	}
+
+	public Computer mapAddComputerDTOToComputer(AddComputerDTO computerDTO) {
+		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+
+		return new Computer.ComputerBuilder().setName(computerDTO.getName())
+				.setIntroduced(LocalDate.parse(computerDTO.getIntroduced()))
+				.setDiscontinued(LocalDate.parse(computerDTO.getDiscontinued())).setCompany(company).build();
 	}
 
 	private LocalDate convertToLocalDate(Date date) {

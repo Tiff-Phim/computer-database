@@ -16,6 +16,10 @@ public class ComputerDTO {
 		this.companyName = companyName;
 	}
 
+	public ComputerDTO() {
+		super();
+	}
+
 	public long getId() {
 		return id;
 	}
