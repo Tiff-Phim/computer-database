@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DBConnection {
 	
-	private static final String PROP_FILE_NAME = "resources/config/db.properties";
+	private static final String PROP_FILE_NAME = "config/db.properties";
 	private static final String PROPERTY_URL = "db.url";
 	private static final String PROPERTY_USER = "db.user";
 	private static final String PROPERTY_PASSWORD = "db.password";
@@ -38,7 +38,7 @@ public class DBConnection {
 			InputStream stream = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE_NAME);
 			prop.load(stream);
 			this.driver = prop.getProperty(PROPERTY_DRIVER);
-			Class.forName(driver);
+			Class.forName(driver);			
 			this.url = prop.getProperty(PROPERTY_URL);
 			this.user = prop.getProperty(PROPERTY_USER);
 			this.pw = prop.getProperty(PROPERTY_PASSWORD);

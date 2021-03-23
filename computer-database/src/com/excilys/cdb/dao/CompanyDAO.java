@@ -20,7 +20,7 @@ public class CompanyDAO {
 
 	private static final String SQL_GET_ALL_COMPANIES = "SELECT id, name FROM company";
 	private static final String SQL_GET_COMPANY_BY_NAME = "SELECT id, name FROM company WHERE name=?";
-	private static final String SQL_GET_COMAPNY_PAGE = "SELECT id, name FROM company ORDER BY id LIMIT ? OFFSET ?";
+	private static final String SQL_GET_COMPANY_PAGE = "SELECT id, name FROM company ORDER BY id LIMIT ? OFFSET ?";
 
 	private static Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 	
@@ -79,7 +79,7 @@ public class CompanyDAO {
 	public Page<Company> getCompanyPaginated(Page<Company> page) throws SQLException {
 		ArrayList<Optional<Company>> companyList = new ArrayList<>();
 		try (Connection connection = dbConnection.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMAPNY_PAGE)) {
+				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_PAGE)) {
 			logger.debug("CompanyDAO: getting company by page ...");
 			preparedStatement.setInt(1, page.getSize());
 			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
