@@ -3,18 +3,19 @@ package com.excilys.cdb.dao;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 /**
  * DBConnection class defines a single connection to the database.
  * 
  * @author Tiffany PHIMMASANE
- * @version 0.2
+ * @version 0.3
  */
 public class DBConnection {
 	
@@ -26,27 +27,23 @@ public class DBConnection {
 
 	private static DBConnection instance = new DBConnection();
 	private static Logger logger = LoggerFactory.getLogger(DBConnection.class);
-
-	private String driver, url, user, pw;
+	
+	private HikariDataSource dataSource = new HikariDataSource();
 
 	/**
 	 * Default DBConnection constructor.
 	 */
-	private DBConnection() {
+	private DBConnection() {		
 		try {
 			Properties prop = new Properties();
 			InputStream stream = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE_NAME);
 			prop.load(stream);
-			this.driver = prop.getProperty(PROPERTY_DRIVER);
-			Class.forName(driver);			
-			this.url = prop.getProperty(PROPERTY_URL);
-			this.user = prop.getProperty(PROPERTY_USER);
-			this.pw = prop.getProperty(PROPERTY_PASSWORD);
+			dataSource.setDriverClassName(prop.getProperty(PROPERTY_DRIVER));
+			dataSource.setJdbcUrl(prop.getProperty(PROPERTY_URL));
+			dataSource.setUsername(prop.getProperty(PROPERTY_USER));
+			dataSource.setPassword(prop.getProperty(PROPERTY_PASSWORD));
 		} catch (IOException e) {
-			logger.error("");
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Couldn't connect to database.", e);
 		}
 	}
 
@@ -69,6 +66,6 @@ public class DBConnection {
 	 * @throws SQLException thrown if connection fails
 	 */
 	public Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(url, user, pw);
+		return dataSource.getConnection();
 	}
 }
