@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.excilys.cdb.dto.AddComputerDTO;
+import com.excilys.cdb.dto.EditComputerDTO;
 
-public class AddComputerValidator {
+public class ComputerValidator {
 	
 	private static final String COMPUTER_NAME_FORMAT = "^[a-zA-Z].*";
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -19,6 +20,20 @@ public class AddComputerValidator {
 	public Map<String, String> validateComputer(AddComputerDTO computer) {
 		Map<String, String> errors = new HashMap<String, String>();
 		if (!nameValidator(computer.getName())) {
+			errors.put(ATT_COMPUTER_NAME, "The name specified should begin with a letter.");
+		}
+		if (!dateValidator(computer.getIntroduced(), computer.getDiscontinued())) {
+			errors.put(ATT_DISCONTINUED_DATE, "The discontinued date can't be before the introduced date.");
+		}
+		if (!companyValidator(computer.getCompanyId())) {
+			errors.put(ATT_COMPANY_ID, "Invalid company. Please select a valid company.");
+		}		
+		return errors;
+	}
+	
+	public Map<String, String> validateComputer(EditComputerDTO computer) {
+		Map<String, String> errors = new HashMap<String, String>();
+		if (!nameValidator(computer.getComputerName())) {
 			errors.put(ATT_COMPUTER_NAME, "The name specified should begin with a letter.");
 		}
 		if (!dateValidator(computer.getIntroduced(), computer.getDiscontinued())) {
@@ -38,9 +53,12 @@ public class AddComputerValidator {
 	}
 	
 	private boolean dateValidator(String introduced, String discontinued) {
-		if (introduced != null && discontinued != null) {
-			LocalDate dateDiscontinued = LocalDate.parse(discontinued, DateTimeFormatter.ofPattern(DATE_FORMAT));
+		if (introduced.isEmpty() && discontinued.isEmpty()) {
+			return true;
+		}
+		if ((!introduced.trim().isEmpty() && introduced != null) || (!discontinued.trim().isEmpty() && discontinued != null)) {
 			LocalDate dateIntroduced = LocalDate.parse(introduced, DateTimeFormatter.ofPattern(DATE_FORMAT));
+			LocalDate dateDiscontinued = LocalDate.parse(discontinued, DateTimeFormatter.ofPattern(DATE_FORMAT));
 			if (dateIntroduced.isBefore(dateDiscontinued)) {
 				return true;
 			}
@@ -49,6 +67,9 @@ public class AddComputerValidator {
 	}
 	
 	private boolean companyValidator(String companyId) {
+		if ("0".equals(companyId)) {
+			return true;
+		}
 		if (companyId != null) {
 			int company = Integer.parseInt(companyId);
 			if (company <= 0) {

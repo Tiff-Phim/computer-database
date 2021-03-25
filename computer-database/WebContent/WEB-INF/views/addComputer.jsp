@@ -7,17 +7,14 @@
 <title>Computer Database</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Bootstrap -->
-<link href="/computer-database/css/bootstrap.min.css" rel="stylesheet"
-	media="screen">
-<link href="/computer-database/css/font-awesome.css" rel="stylesheet"
-	media="screen">
-<link href="/computer-database/css/main.css" rel="stylesheet"
-	media="screen">
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="/computer-database/DashboardServlet">
+			<a class="navbar-brand" href="DashboardServlet">
 				Application - Computer Database </a>
 		</div>
 	</header>
@@ -66,7 +63,7 @@
 						
 						<div class="actions pull-right">
 							<input type="submit" value="Add" class="btn btn-primary">
-							or <a href="/computer-database/DashboardServlet" class="btn btn-default">Cancel</a>
+							or <a href="DashboardServlet" class="btn btn-default">Cancel</a>
 						</div>
 					</form>
 				</div>
@@ -74,9 +71,9 @@
 		</div>
 	</section>
 
-	<script src="/computer-database/js/jquery.min.js"></script>
-	<script src="/computer-database/js/bootstrap.min.js"></script>
-	<script src="/computer-database/js/addComputerValidator.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/addComputerValidator.js"></script>
 	
 </body>
 </html>
