@@ -9,17 +9,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<link href="/computer-database/css/bootstrap.min.css" rel="stylesheet"
-	media="screen">
-<link href="/computer-database/css/font-awesome.css" rel="stylesheet"
-	media="screen">
-<link href="/computer-database/css/main.css" rel="stylesheet"
-	media="screen">
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="/computer-database/DashboardServlet">
+			<a class="navbar-brand" href="DashboardServlet">
 				Application - Computer Database </a>
 		</div>
 	</header>
@@ -42,7 +39,7 @@
 				</div>
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer"
-						href="/computer-database/AddComputerServlet">Add Computer</a> <a
+						href="AddComputerServlet">Add Computer</a> <a
 						class="btn btn-default" id="editComputer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
@@ -83,8 +80,9 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="${ computer.get().getId() }"></td>
-							<td><a href="editComputer.html" onclick=""><c:out
-										value="${computer.get().getName() }" /></a></td>
+							<td><a href="<c:url value="EditComputerServlet"><c:param name="computerId" 
+								value="${ computer.get().getId() }"/></c:url>"><c:out
+										value="${computer.get().getName() }" /></a></td>									
 							<td><c:out value="${computer.get().getIntroduced() }" /></td>
 							<td><c:out value="${computer.get().getDiscontinued() }" /></td>
 							<td><c:out value="${computer.get().getCompany().getName() }" /></td>
@@ -120,7 +118,7 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-			<form action="/computer-database/DashboardServlet">
+			<form action="DashboardServlet">
 				<button name="pageSize" type="submit" class="btn btn-default" value="10">10</button>
 				<button name="pageSize" type="submit" class="btn btn-default" value="50">50</button>
 				<button name="pageSize" type="submit" class="btn btn-default" value="100">100</button>
@@ -130,9 +128,9 @@
 		</div>
 	</footer>
 
-	<script src="/computer-database/js/jquery.min.js"></script>
-	<script src="/computer-database/js/bootstrap.min.js"></script>
-	<script src="/computer-database/js/dashboard.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/dashboard.js"></script>
 
 </body>
 </html>
