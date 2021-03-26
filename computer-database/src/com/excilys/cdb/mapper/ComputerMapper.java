@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.dto.EditComputerDTO;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
@@ -61,8 +62,17 @@ public class ComputerMapper {
 
 	public Computer mapAddComputerDTOToComputer(AddComputerDTO computerDTO) {
 		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
-
+		
 		return new Computer.ComputerBuilder().setName(computerDTO.getName())
+				.setIntroduced(computerDTO.getIntroduced().isEmpty() ? null : LocalDate.parse(computerDTO.getIntroduced()))
+				.setDiscontinued(computerDTO.getDiscontinued().isEmpty() ? null : LocalDate.parse(computerDTO.getDiscontinued()))
+				.setCompany(company).build();
+	}
+	
+	public Computer mapEditComputerDTOToComputer(EditComputerDTO computerDTO) {
+		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+
+		return new Computer.ComputerBuilder().setName(computerDTO.getComputerName())
 				.setIntroduced(LocalDate.parse(computerDTO.getIntroduced()))
 				.setDiscontinued(LocalDate.parse(computerDTO.getDiscontinued())).setCompany(company).build();
 	}

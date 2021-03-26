@@ -139,9 +139,12 @@ public class ComputerDAO {
 				logger.debug("ComputerDAO: creating new computer ...");
 				initPreparedStatement(preparedStatement, computer);
 				preparedStatement.setString(1, computer.getName());
-				preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
-				preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
-
+				if (computer.getIntroduced() != null) {
+					preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
+				}
+				if (computer.getDiscontinued() != null) {
+					preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
+				}
 				if (computer.getCompany().getId() != 0l) {
 					preparedStatement.setLong(4, computer.getCompany().getId());
 				} else {

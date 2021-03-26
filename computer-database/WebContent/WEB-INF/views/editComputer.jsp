@@ -32,7 +32,7 @@
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
-                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="${ empty computer.get().getName() ?  'Computer name' : computer.get().getName()}">
+                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="${computer.get().getName()}">
                                 <span class="error"><c:out value="${errors['computerName']}" /></span>
                             </div>
                             <div class="form-group">
@@ -47,7 +47,7 @@
                             <div class="form-group">
 								<label for="companyId">Company</label> 
 								<select class="form-control" id="companyId" name="companyId">
-									<option value="0">Please select a company</option>
+									<option value="0" disabled selected><c:out value="${computer.get().getCompany().getId() != 0 ? computer.get().getCompany().getName() : 'Please select a company'}"/></option>
 									<c:forEach var="company" items="${companyList}">
 										<option value="${ company.getId()}"><c:out
 												value="${ company.getName() }" /></option>

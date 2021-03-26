@@ -18,7 +18,6 @@ import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
-import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
 /**
@@ -35,11 +34,6 @@ public class DashboardServlet extends HttpServlet {
 
 	private static final String ATT_COMPUTER_TOTAL = "computerTotal";
 	private static final String ATT_COMPUTER_LIST = "listComputer";
-	private static final String ATT_COMPUTER_NAME = "computerName";
-	private static final String ATT_COMPUTER_ID = "computerId";
-	private static final String ATT_COMPUTER_INTRODUCED = "introducedDate";
-	private static final String ATT_COMPUTER_DISCONTINUED = "discontinuedDate";
-	private static final String ATT_COMPANY_NAME = "companyName";
 
 	private static final String ATT_COMPUTER_PAGE = "computerPage";
 	private static final String ATT_PAGE_NUMBER = "pageNumber";
@@ -49,7 +43,6 @@ public class DashboardServlet extends HttpServlet {
 	private static final String ATT_LIST_PAGE_NUMBERS = "listPageNumbers";
 
 	private ComputerService computerService;
-	private CompanyService companyService;
 
 	private static ComputerMapper mapper = new ComputerMapper();
 	private int pageSize = 10;
@@ -60,7 +53,6 @@ public class DashboardServlet extends HttpServlet {
 	public DashboardServlet() {
 		super();
 		this.computerService = new ComputerService();
-		this.companyService = new CompanyService();
 	}
 
 	/**
