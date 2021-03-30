@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +17,9 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.CompanyDTO;
@@ -29,6 +33,7 @@ import com.excilys.cdb.servlet.validator.ComputerValidator;
 /**
  * Servlet implementation class AddComputerServlet
  */
+@Component
 @WebServlet("/AddComputerServlet")
 public class AddComputerServlet extends HttpServlet {
 
@@ -48,16 +53,15 @@ public class AddComputerServlet extends HttpServlet {
 	private static CompanyMapper companyMapper = new CompanyMapper();
 	private static ComputerMapper computerMapper = new ComputerMapper();
 	
+	@Autowired
 	private CompanyService companyService;
+	@Autowired
 	private ComputerService computerService;
-
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public AddComputerServlet() {
-		super();
-		this.companyService = new CompanyService();
-		this.computerService = new ComputerService();
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+		super.init(config);
 	}
 
 	/**

@@ -4,10 +4,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 import com.excilys.cdb.service.ComputerService;
 
+@Controller
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerController {
 
 	ComputerService computerService = new ComputerService();

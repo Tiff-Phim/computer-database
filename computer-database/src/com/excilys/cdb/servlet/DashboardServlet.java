@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +17,9 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.mapper.ComputerMapper;
@@ -28,6 +32,7 @@ import com.excilys.cdb.service.ComputerService;
 /**
  * Servlet implementation class ListComputerServlet
  */
+@Component
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
 
@@ -48,19 +53,18 @@ public class DashboardServlet extends HttpServlet {
 	private static final String ATT_SORT_FILTER = "filter";
 	private static final String ATT_SORT_ORDER = "order";
 
+	@Autowired
 	private ComputerService computerService;
 
 	private static ComputerMapper mapper = new ComputerMapper();
 	private int pageSize = 10;
 	
 	private static Logger logger = LoggerFactory.getLogger(DashboardServlet.class);
-
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public DashboardServlet() {
-		super();
-		this.computerService = new ComputerService();
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+		super.init(config);
 	}
 
 	/**

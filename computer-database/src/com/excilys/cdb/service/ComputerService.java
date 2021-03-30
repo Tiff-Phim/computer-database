@@ -3,10 +3,16 @@ package com.excilys.cdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 import com.excilys.cdb.dao.ComputerDAO;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 
+@Service
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerService {
 
 	ComputerDAO computerDAO = new ComputerDAO();
