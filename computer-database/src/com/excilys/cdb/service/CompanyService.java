@@ -23,5 +23,9 @@ public class CompanyService {
 	public Optional<Company> getCompanyByName(String companyName) throws SQLException {
 		return companyDAO.findCompanyByName(companyName);
 	}
+	
+	public void deleteCompanyById(long id) throws SQLException {
+		companyDAO.deleteCompanyById(id);
+	}
 
 }

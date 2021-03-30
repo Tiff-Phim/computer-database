@@ -29,6 +29,7 @@ public class Menu {
 		st.addRow(String.valueOf(MenuCommand.ADD_NEW_COMPUTER.value), MenuCommand.ADD_NEW_COMPUTER.description);
 		st.addRow(String.valueOf(MenuCommand.UPDATE_COMPUTER.value), MenuCommand.UPDATE_COMPUTER.description);
 		st.addRow(String.valueOf(MenuCommand.DELETE_COMPUTER.value), MenuCommand.DELETE_COMPUTER.description);
+		st.addRow(String.valueOf(MenuCommand.DELETE_COMPANY.value), MenuCommand.DELETE_COMPANY.description);
 		st.addRow(String.valueOf(MenuCommand.QUIT_CLI.value), MenuCommand.QUIT_CLI.description);
 		st.print();
 	}
@@ -86,7 +87,7 @@ public class Menu {
 	}
 	
 	private <T> void printPage(Page<T> page) {
-		System.out.println("Printing page ..."); //TODO
+		System.out.println("Printing page ...");
 		List<Optional<Computer>> listComputers = new ArrayList<>();
 		for (Optional<T> content : page.getContent()) {
 			Optional<Computer> computer = (Optional<Computer>) Optional.ofNullable(content.get());

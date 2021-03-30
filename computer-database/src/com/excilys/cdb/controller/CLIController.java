@@ -78,17 +78,24 @@ public class CLIController {
 			System.out.println("Computer added to database.");
 			break;
 		case UPDATE_COMPUTER:
-			menu.printElement("Which computer do you want to update ? Enter it's id...");
+			menu.printElement("Which computer do you want to update? Enter it's id...");
 			long computerId = sc.nextLong();
 			computerController.updateComputer(updateComputer(), computerId);
 			System.out.println("Computer updated.");
 			break;
 		case DELETE_COMPUTER:
 			sc.nextLine();
-			menu.printElement("Which computer do you want to delete ? Enter it's id...");
+			menu.printElement("Which computer do you want to delete? Enter it's id...");
 			long computerIdToDelete = sc.nextLong();
 			computerController.deleteComputer(computerIdToDelete);
 			System.out.println("Computer deleted.");
+			break;
+		case DELETE_COMPANY:
+			sc.nextLine();
+			menu.printElement("Which company do you want to delete? Please enter it's id ...");
+			long companyIdToDelete = sc.nextLong();
+			companyController.deleteCompanyById(companyIdToDelete);
+			System.out.println("Company deleted.");
 			break;
 		case QUIT_CLI:
 			System.out.println("Bye");
