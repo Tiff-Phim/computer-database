@@ -15,8 +15,8 @@ import java.util.Optional;
 public class Page<E> {
 
 	private static final int DEFAULT_PAGE_SIZE = 10;
-	private static final FilterAttribute DEFAULT_PAGE_FILTER = FilterAttribute.COMPUTER_ID;
-	private static final SortingOrder DEFAULT_SORTING_ORDER = SortingOrder.ASC;
+	public static final FilterAttribute DEFAULT_PAGE_FILTER = FilterAttribute.COMPUTER_ID;
+	public static final SortingOrder DEFAULT_SORTING_ORDER = SortingOrder.ASC;
 
 	private int size;
 	private int number;

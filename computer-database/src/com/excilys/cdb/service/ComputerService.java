@@ -26,6 +26,10 @@ public class ComputerService {
 	public Optional<Computer> getComputerByName(String name) {
 		return computerDAO.findComputerByName(name);
 	}
+	
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
+		return computerDAO.getComputerPaginatedByNameFilter(page, filter);
+	}
 
 	public void addComputer(Computer computer) {
 		computerDAO.createComputer(computer);

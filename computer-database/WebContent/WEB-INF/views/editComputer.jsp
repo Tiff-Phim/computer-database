@@ -23,31 +23,31 @@
             <div class="row">
                 <div class="col-xs-8 col-xs-offset-2 box">
                     <div class="label label-default pull-right">
-                        id: ${computer.get().getId() }
+                        id: ${computer.getComputerId() }
                     </div>
                     <h1>Edit Computer</h1>
 
                     <form action="EditComputerServlet" method="POST">
-                        <input type="hidden" value="${computer.get().getId() }" id="id" name="computerId"/>
+                        <input type="hidden" value="${computer.getComputerId() }" id="id" name="computerId"/>
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
-                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="${computer.get().getName()}">
+                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="${computer.getComputerName()}">
                                 <span class="error"><c:out value="${errors['computerName']}" /></span>
                             </div>
                             <div class="form-group">
                                 <label for="introduced">Introduced date</label>
-                                <input type="date" class="form-control" id="introduced" name="introduced" placeholder="${ empty computer.get().getIntroduced() ?  'Introduced date' : computer.get().getIntroduced()}">
+                                <input type="date" class="form-control" id="introduced" name="introduced" placeholder="${ empty computer.getIntroduced() ?  'Introduced date' : computer.getIntroduced()}">
                             </div>
                             <div class="form-group">
                                 <label for="discontinued">Discontinued date</label>
-                                <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="${ empty computer.get().getDiscontinued() ?  'Discontinued date' : computer.get().getDiscontinued()}">
+                                <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="${ empty computer.getDiscontinued() ?  'Discontinued date' : computer.getDiscontinued()}">
                                 <span class="error"><c:out value="${errors['discontinued']}" /></span>
                             </div>                            
                             <div class="form-group">
 								<label for="companyId">Company</label> 
 								<select class="form-control" id="companyId" name="companyId">
-									<option value="0" disabled selected><c:out value="${computer.get().getCompany().getId() != 0 ? computer.get().getCompany().getName() : 'Please select a company'}"/></option>
+									<option value="0" disabled selected><c:out value="Please select a company"/></option>
 									<c:forEach var="company" items="${companyList}">
 										<option value="${ company.getId()}"><c:out
 												value="${ company.getName() }" /></option>

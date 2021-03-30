@@ -29,11 +29,11 @@
 			</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
-					<form id="searchForm" action="#" method="GET" class="form-inline">
+					<form id="searchForm" action="DashboardServlet" method="GET" class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
-							class="form-control" placeholder="Search name" /> <input
-							type="submit" id="searchsubmit" value="Filter by name"
+							class="form-control" placeholder="Search name" /> 
+						<input type="submit" id="searchsubmit" value="Filter by name"
 							class="btn btn-primary" />
 					</form>
 				</div>
@@ -49,6 +49,10 @@
 		<form id="deleteForm" action="DeleteComputerServlet" method="POST">
 			<input type="hidden" name="selection" value="">
 		</form>
+		
+		<form id="sortForm" action="#" method="POST">
+			<input type="hidden" name="filter" value="">
+		</form>
 
 		<div class="container" style="margin-top: 10px;">
 			<table class="table table-striped table-bordered">
@@ -63,13 +67,17 @@
 								id="deleteSelected" onclick="$.fn.deleteSelected();"> <i
 									class="fa fa-trash-o fa-lg"></i>
 							</a>
-						</span></th>
-						<th>Computer name</th>
-						<th>Introduced date</th>
+						</span></th>						
+						<th>Computer name <a href="#" id="orderByComputerName" onclick="$.fn.orderBy('COMPUTER_NAME');">
+						<i class="fa fa-fw fa-sort pull-right fa-clickable"></i></a></th>
+						<th>Introduced date <a href="#" id="orderByIntroducedDate" onclick="$.fn.orderBy('COMPUTER_INTRODUCED');">
+						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 						<!-- Table header for Discontinued Date -->
-						<th>Discontinued date</th>
+						<th>Discontinued date <a href="#" id="orderByDiscontinuedDate" onclick="$.fn.orderBy('COMPUTER_DISCONTINUED');">
+						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 						<!-- Table header for Company -->
-						<th>Company</th>
+						<th>Company <a href="#" id="orderByCompanyrName" onclick="$.fn.orderBy('COMPANY_NAME');">
+						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 
 					</tr>
 				</thead>
@@ -79,13 +87,13 @@
 					<c:forEach var="computer" items="${computerPage}">
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
-								class="cb" value="${ computer.get().getId() }"></td>
+								class="cb" value="${ computer.getId() }"></td>
 							<td><a href="<c:url value="EditComputerServlet"><c:param name="computerId" 
-								value="${ computer.get().getId() }"/></c:url>"><c:out
-										value="${computer.get().getName() }" /></a></td>									
-							<td><c:out value="${computer.get().getIntroduced() }" /></td>
-							<td><c:out value="${computer.get().getDiscontinued() }" /></td>
-							<td><c:out value="${computer.get().getCompany().getName() }" /></td>
+								value="${ computer.getId() }"/></c:url>"><c:out
+										value="${computer.getName() }" /></a></td>									
+							<td><c:out value="${computer.getIntroduced() }" /></td>
+							<td><c:out value="${computer.getDiscontinued() }" /></td>
+							<td><c:out value="${computer.getCompanyName() }" /></td>
 						</tr>
 					</c:forEach>
 				</tbody>

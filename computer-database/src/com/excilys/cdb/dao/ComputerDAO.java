@@ -33,7 +33,11 @@ public class ComputerDAO {
 	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET computer.name=?, computer.introduced=?, computer.discontinued=?"
 			+ ", computer.company_id=? WHERE computer.id=?";
 	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id=?";
-
+	private static final String SQL_SEARCH_COMPUTER_BY_NAME_FILTER = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued, computer.company_id"
+			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id"
+			+ " WHERE (computer.name like ?) OR (company.name like ?)"
+			+ " ORDER BY SORT_BY SORT_ORDER LIMIT ? OFFSET ?";
+	
 	private static Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
 	private static DBConnection dbConnection = DBConnection.getInstance();
@@ -125,6 +129,35 @@ public class ComputerDAO {
 			logger.error("Error occur in ComputerDAO, could not get computer by name.", e);
 		}
 		return computer;
+	}
+	
+	/**
+	 * List computers by pages with name filter. The filter is on both computer and company names.
+	 * 
+	 * @param page
+	 * @param filter
+	 * @return page of computers
+	 */
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
+		List<Optional<Computer>> computerList = new ArrayList<>();
+		try (Connection connection = dbConnection.getConnection();
+				PreparedStatement preparedStatement = connection
+						.prepareStatement(SQL_SEARCH_COMPUTER_BY_NAME_FILTER.replaceFirst("SORT_ORDER", page.getOrder().name())
+								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
+			logger.debug("ComputerDAO: getting all computers search by name filter with pagination ...");
+			preparedStatement.setString(1, "%" + filter + "%");
+			preparedStatement.setString(2, "%" + filter + "%");
+			preparedStatement.setInt(3, page.getSize());
+			preparedStatement.setInt(4, (page.getNumber() - 1) * page.getSize());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				computerList.add(mapper.mapToComputer(resultSet));
+				page.setContent(computerList);
+			}
+		} catch (SQLException e) {
+			logger.error("Error occur in ComputerDAO, could not get computer matching the name " + filter, e);
+		}
+		return page;
 	}
 
 	/**

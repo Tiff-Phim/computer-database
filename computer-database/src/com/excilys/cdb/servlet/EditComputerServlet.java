@@ -73,8 +73,9 @@ public class EditComputerServlet extends HttpServlet {
 		
 		if (request.getParameter(ATT_COMPUTER_ID) != null) {
 			long computerId = Long.valueOf(request.getParameter(ATT_COMPUTER_ID));
+			
 			Optional<Computer> computer = computerService.getComputerById(computerId);			
-			session.setAttribute(ATT_COMPUTER, computer);
+			session.setAttribute(ATT_COMPUTER, computerMapper.mapComputerToEditComputerDTO(computer));
 		}
 		this.getServletContext().getRequestDispatcher(VUE_FORM).forward(request, response);
 	}

@@ -56,12 +56,15 @@ public class ComputerValidator {
 		if (introduced.isEmpty() && discontinued.isEmpty()) {
 			return true;
 		}
-		if ((!introduced.isEmpty() && introduced != null) || (!discontinued.isEmpty() && discontinued != null)) {
+		if (!introduced.isEmpty() && introduced != null) {
 			LocalDate dateIntroduced = LocalDate.parse(introduced, DateTimeFormatter.ofPattern(DATE_FORMAT));
-			LocalDate dateDiscontinued = LocalDate.parse(discontinued, DateTimeFormatter.ofPattern(DATE_FORMAT));
-			if (dateIntroduced.isBefore(dateDiscontinued)) {
-				return true;
+			if (!discontinued.isEmpty() && discontinued != null) {
+				LocalDate dateDiscontinued = LocalDate.parse(discontinued, DateTimeFormatter.ofPattern(DATE_FORMAT));
+				if (dateIntroduced.isBefore(dateDiscontinued)) {
+					return true;
+				}
 			}
+			return true;
 		}
 		return false;
 	}

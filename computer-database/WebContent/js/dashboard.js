@@ -70,6 +70,14 @@ $(function() {
 }( jQuery ));
 
 
+// Function sort by: sort table
+(function ( $ ) {
+    $.fn.orderBy = function(attr) {
+        $('#sortForm input[name="filter"]').attr('value', attr);
+        $('#sortForm').submit();
+    };
+}( jQuery ));
+
 
 //Event handling
 //Onkeydown

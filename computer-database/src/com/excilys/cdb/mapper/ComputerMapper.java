@@ -4,7 +4,9 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -60,21 +62,43 @@ public class ComputerMapper {
 		return null;
 	}
 
+	public List<ComputerDTO> mapListComputerToListComputerDTO(List<Optional<Computer>> computers) {
+		List<ComputerDTO> listComputer = computers.stream()
+				.map(c -> new ComputerDTO(c.get().getId(), c.get().getName(),
+						c.get().getIntroduced() != null ? c.get().getIntroduced().toString() : null,
+						c.get().getDiscontinued() != null ? c.get().getDiscontinued().toString() : null,
+						c.get().getCompany().getName() != null ? c.get().getCompany().getName() : null))
+				.collect(Collectors.toList());
+		return listComputer;
+	}
+
 	public Computer mapAddComputerDTOToComputer(AddComputerDTO computerDTO) {
 		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
-		
+
 		return new Computer.ComputerBuilder().setName(computerDTO.getName())
-				.setIntroduced(computerDTO.getIntroduced().isEmpty() ? null : LocalDate.parse(computerDTO.getIntroduced()))
-				.setDiscontinued(computerDTO.getDiscontinued().isEmpty() ? null : LocalDate.parse(computerDTO.getDiscontinued()))
+				.setIntroduced(
+						computerDTO.getIntroduced().isEmpty() ? null : LocalDate.parse(computerDTO.getIntroduced()))
+				.setDiscontinued(
+						computerDTO.getDiscontinued().isEmpty() ? null : LocalDate.parse(computerDTO.getDiscontinued()))
 				.setCompany(company).build();
 	}
-	
+
 	public Computer mapEditComputerDTOToComputer(EditComputerDTO computerDTO) {
 		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
 
 		return new Computer.ComputerBuilder().setName(computerDTO.getComputerName())
 				.setIntroduced(LocalDate.parse(computerDTO.getIntroduced()))
 				.setDiscontinued(LocalDate.parse(computerDTO.getDiscontinued())).setCompany(company).build();
+	}
+
+	public EditComputerDTO mapComputerToEditComputerDTO(Optional<Computer> computer) {
+		if (computer.isPresent()) {
+			return new EditComputerDTO(String.valueOf(computer.get().getId()), computer.get().getName(),
+					computer.get().getIntroduced() != null ? computer.get().getIntroduced().toString() : "", 
+					computer.get().getDiscontinued() != null ?	computer.get().getDiscontinued().toString() : "",
+					String.valueOf(computer.get().getCompany().getId()));
+		}
+		return null;
 	}
 
 	private LocalDate convertToLocalDate(Date date) {

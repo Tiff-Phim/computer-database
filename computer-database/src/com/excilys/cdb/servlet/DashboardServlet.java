@@ -14,10 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
+import com.excilys.cdb.model.Page.FilterAttribute;
+import com.excilys.cdb.model.Page.SortingOrder;
 import com.excilys.cdb.service.ComputerService;
 
 /**
@@ -29,24 +34,27 @@ public class DashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final String VUE_FORM = "/WEB-INF/views/dashboard.jsp";
-	
+
 	private static final int OFFSET = 5;
 
 	private static final String ATT_COMPUTER_TOTAL = "computerTotal";
-	private static final String ATT_COMPUTER_LIST = "listComputer";
-
 	private static final String ATT_COMPUTER_PAGE = "computerPage";
 	private static final String ATT_PAGE_NUMBER = "pageNumber";
-	private static final String ATT_PAGE_TOTAL = "pageTotal";
 	private static final String ATT_PAGE_SIZE = "pageSize";
-	
+	private static final String ATT_PAGE_TOTAL = "pageTotal";
 	private static final String ATT_LIST_PAGE_NUMBERS = "listPageNumbers";
+	private static final String ATT_SEARCH = "search";
+	
+	private static final String ATT_SORT_FILTER = "filter";
+	private static final String ATT_SORT_ORDER = "order";
 
 	private ComputerService computerService;
 
 	private static ComputerMapper mapper = new ComputerMapper();
 	private int pageSize = 10;
 	
+	private static Logger logger = LoggerFactory.getLogger(DashboardServlet.class);
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -65,25 +73,32 @@ public class DashboardServlet extends HttpServlet {
 		List<ComputerDTO> computers = getComputerList();
 		int pageNumber;
 		int totalPages = computers.size();
-		
+
 		if (request.getParameter(ATT_PAGE_SIZE) != null) {
 			pageSize = Integer.parseInt(request.getParameter(ATT_PAGE_SIZE));
 		}
-		
+
 		try {
 			pageNumber = Integer.parseInt(request.getParameter("page"));
-		} catch (NumberFormatException numberFormatExceptoin) {
+		} catch (NumberFormatException e) {
+			logger.warn("Parameter " + request.getParameter("page") + " couldn't be parsed to an int.", e);
 			pageNumber = 1;
+		}
+		
+		List<Optional<Computer>> page = new ArrayList<Optional<Computer>>();
+		String search = request.getParameter(ATT_SEARCH);
+		if (search != null) {
+			page = computerService.getComputerPaginatedByNameFilter(new Page<Computer>(pageSize, pageNumber), search).getContent();
+		} else {
+			page = computerService.getComputerPaginated(new Page<Computer>(pageSize, pageNumber)).getContent();
 		}
 		
 		List<Integer> pageNumbers = listPageNumbers(pageNumber, computers.size() / pageSize + 1);
 
 		session.setAttribute(ATT_PAGE_TOTAL, String.valueOf(totalPages / pageSize + 1));
-		session.setAttribute(ATT_COMPUTER_LIST, computers);
 		session.setAttribute(ATT_COMPUTER_TOTAL, totalPages);
 		session.setAttribute(ATT_PAGE_NUMBER, pageNumber);
-		session.setAttribute(ATT_COMPUTER_PAGE,
-				computerService.getComputerPaginated(new Page<Computer>(pageSize, pageNumber)).getContent());
+		session.setAttribute(ATT_COMPUTER_PAGE, mapper.mapListComputerToListComputerDTO(page));
 		session.setAttribute(ATT_LIST_PAGE_NUMBERS, pageNumbers);
 
 		this.getServletContext().getRequestDispatcher(VUE_FORM).forward(request, response);
@@ -95,9 +110,14 @@ public class DashboardServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		Page<Computer> computerPage = new Page<Computer>(pageSize, 1);
+		setSortingOrder(request, computerPage);
+		setFilterAttribute(request, computerPage);
+		List<Optional<Computer>> page = computerService.getComputerPaginated(computerPage).getContent();
+		request.setAttribute(ATT_COMPUTER_PAGE, mapper.mapListComputerToListComputerDTO(page));
 		doGet(request, response);
 	}
-	
+
 	private List<ComputerDTO> getComputerList() {
 		List<Optional<Computer>> daoComputers = new ArrayList<Optional<Computer>>();
 		daoComputers = computerService.getInfoComputer();
@@ -105,7 +125,7 @@ public class DashboardServlet extends HttpServlet {
 		List<ComputerDTO> computers = new ArrayList<ComputerDTO>();
 		for (Optional<Computer> computer : daoComputers) {
 			computers.add(mapper.mapToComputerDTO(computer));
-		}
+		}		
 		return computers;
 	}
 
@@ -118,6 +138,24 @@ public class DashboardServlet extends HttpServlet {
 			start = end - OFFSET + 1;
 		}
 		return IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
+	}
+	
+	private void setSortingOrder(HttpServletRequest request, Page<Computer> page) {
+		if (Page.DEFAULT_SORTING_ORDER.equals(request.getSession().getAttribute(ATT_SORT_ORDER))) {
+			request.getSession().setAttribute(ATT_SORT_ORDER, SortingOrder.DESC);
+			page.setOrder(SortingOrder.DESC);
+		} else {
+			request.getSession().setAttribute(ATT_SORT_ORDER, SortingOrder.ASC);
+			page.setOrder(SortingOrder.ASC);
+		}
+	}
+	
+	private void setFilterAttribute(HttpServletRequest request, Page<Computer> page) {
+		if(request.getParameter(ATT_SORT_FILTER) != null) {
+			page.setFilter(FilterAttribute.valueOf((String) request.getParameter(ATT_SORT_FILTER)));
+		} else {
+			page.setFilter(Page.DEFAULT_PAGE_FILTER);
+		}
 	}
 
 }
