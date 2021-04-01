@@ -28,5 +28,9 @@ public class CompanyController {
 	public Optional<Company> getCompanyByName(String companyName) throws SQLException {
 		return companyService.getCompanyByName(companyName);
 	}
+	
+	public void deleteCompanyById(long id) throws SQLException {
+		companyService.deleteCompanyById(id);
+	}
 
 }
