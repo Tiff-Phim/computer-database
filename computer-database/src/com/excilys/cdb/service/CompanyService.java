@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,8 @@ import com.excilys.cdb.model.Page;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CompanyService {
 
-	CompanyDAO companyDAO = new CompanyDAO();
+	@Autowired
+	CompanyDAO companyDAO;
 	
 	public List<Optional<Company>> getAllCompany() throws SQLException {
 		return companyDAO.findAllCompanies();

@@ -12,17 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 
-@Component
+@Repository
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerDAO {
 
@@ -45,8 +48,10 @@ public class ComputerDAO {
 	
 	private static Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-	private static DBConnection dbConnection = DBConnection.getInstance();
-	private static ComputerMapper mapper = new ComputerMapper();
+	@Autowired
+	private DataSource dataSource;
+	@Autowired
+	private ComputerMapper mapper;
 
 	/**
 	 * Lists all computers present in database.
@@ -56,7 +61,7 @@ public class ComputerDAO {
 	 */
 	public List<Optional<Computer>> findAllComputers() {
 		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dbConnection.getConnection(); Statement statement = connection.createStatement()) {
+		try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
 			logger.debug("ComputerDAO: getting all computers ...");
 			ResultSet resultSet = statement.executeQuery(SQL_GET_ALL_COMPUTERS);
 			while (resultSet.next()) {
@@ -76,7 +81,7 @@ public class ComputerDAO {
 	 */
 	public Page<Computer> getComputerPaginated(Page<Computer> page) {
 		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection
 						.prepareStatement(SQL_GET_PAGE.replaceFirst("SORT_ORDER", page.getOrder().name())
 								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
@@ -102,7 +107,7 @@ public class ComputerDAO {
 	 */
 	public Optional<Computer> findComputerById(long computerId) {
 		Optional<Computer> computer = Optional.empty();
-		try (Connection con = dbConnection.getConnection();
+		try (Connection con = dataSource.getConnection();
 				PreparedStatement prepStatement = con.prepareStatement(SQL_GET_COMPUTER_BY_ID)) {
 			logger.debug("ComputerDAO: getting computer by id ...");
 			prepStatement.setLong(1, computerId);
@@ -123,7 +128,7 @@ public class ComputerDAO {
 	 */
 	public Optional<Computer> findComputerByName(String name) {
 		Optional<Computer> computer = Optional.empty();
-		try (Connection con = dbConnection.getConnection();
+		try (Connection con = dataSource.getConnection();
 				PreparedStatement prepStatement = con.prepareStatement(SQL_GET_COMPUTER_BY_NAME)) {
 			logger.debug("ComputerDAO: getting computer by name ...");
 			prepStatement.setString(1, name);
@@ -145,7 +150,7 @@ public class ComputerDAO {
 	 */
 	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
 		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection
 						.prepareStatement(SQL_SEARCH_COMPUTER_BY_NAME_FILTER.replaceFirst("SORT_ORDER", page.getOrder().name())
 								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
@@ -172,7 +177,7 @@ public class ComputerDAO {
 	 */
 	public void createComputer(Computer computer) {
 		if (computer != null) {
-			try (Connection connection = dbConnection.getConnection();
+			try (Connection connection = dataSource.getConnection();
 					PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_COMPUTER)) {
 				logger.debug("ComputerDAO: creating new computer ...");
 				initPreparedStatement(preparedStatement, computer);
@@ -203,7 +208,7 @@ public class ComputerDAO {
 	 * @throws SQLException
 	 */
 	public void updateComputerById(Computer computer, long computerId) {
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_COMPUTER_BY_ID)) {
 			logger.debug("ComputerDAO: updating computer ...");
 			preparedStatement.setString(1, computer.getName());
@@ -229,7 +234,7 @@ public class ComputerDAO {
 	 * @throws SQLException
 	 */
 	public void deleteComputerById(long computerId) {
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_COMPUTER_BY_ID)) {
 			logger.debug("ComputerDAO: deleting computer ...");
 			preparedStatement.setLong(1, computerId);

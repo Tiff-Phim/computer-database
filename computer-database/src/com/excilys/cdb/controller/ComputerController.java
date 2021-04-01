@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,8 @@ import com.excilys.cdb.service.ComputerService;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerController {
 
-	ComputerService computerService = new ComputerService();
+	@Autowired
+	ComputerService computerService;
 	
 	public List<Optional<Computer>> getAll() throws SQLException {
 		return computerService.getInfoComputer();

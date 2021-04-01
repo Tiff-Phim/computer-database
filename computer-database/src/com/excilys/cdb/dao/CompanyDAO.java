@@ -9,17 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Page;
 
-@Component
+@Repository
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CompanyDAO {
 
@@ -29,8 +32,10 @@ public class CompanyDAO {
 
 	private static Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 	
-	private static DBConnection dbConnection = DBConnection.getInstance();
-	private static CompanyMapper mapper = new CompanyMapper();
+	@Autowired
+	private DataSource dataSource;
+	@Autowired
+	private CompanyMapper mapper;
 
 	/**
 	 * Lists all companies present in database.
@@ -40,7 +45,7 @@ public class CompanyDAO {
 	 */
 	public List<Optional<Company>> findAllCompanies() throws SQLException {
 		List<Optional<Company>> companyList = new ArrayList<>();
-		try (Connection con = dbConnection.getConnection();
+		try (Connection con = dataSource.getConnection();
 				Statement statement = con.createStatement()) {
 			logger.debug("CompanyDAO: getting all companies ...");
 			ResultSet results = null;
@@ -62,7 +67,7 @@ public class CompanyDAO {
 	 */
 	public Optional<Company> findCompanyByName(String companyName) throws SQLException {
 		Optional<Company> company = Optional.empty();
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_BY_NAME)) {
 			logger.debug("CompanyDAO: getting company by name ...");
 			preparedStatement.setString(1, companyName);
@@ -83,7 +88,7 @@ public class CompanyDAO {
 	 */
 	public Page<Company> getCompanyPaginated(Page<Company> page) throws SQLException {
 		ArrayList<Optional<Company>> companyList = new ArrayList<>();
-		try (Connection connection = dbConnection.getConnection();
+		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_PAGE)) {
 			logger.debug("CompanyDAO: getting company by page ...");
 			preparedStatement.setInt(1, page.getSize());

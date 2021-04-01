@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.cdb.dto.AddComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.dto.EditComputerDTO;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
+@Component
 public class ComputerMapper {
 
 	private static final String ATTRIBUT_ID = "computer.id";

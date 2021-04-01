@@ -54,8 +54,10 @@ public class EditComputerServlet extends HttpServlet {
 	
 	private static Logger logger = LoggerFactory.getLogger(EditComputerServlet.class);
 
-	private static CompanyMapper companyMapper = new CompanyMapper();
-	private static ComputerMapper computerMapper = new ComputerMapper();
+	@Autowired
+	private CompanyMapper companyMapper;
+	@Autowired
+	private ComputerMapper computerMapper;
 	@Autowired
 	private CompanyService companyService;
 	@Autowired

@@ -19,8 +19,10 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 
 		<!-- External dependencies versioning -->
-		<spring-webmvc.version>5.3.5</spring-webmvc.version>
+		<spring.version>5.3.5</spring.version>
+		<spring-jdbc.version>5.3.5</spring-jdbc.version>
 		<mysql-connector.version>8.0.23</mysql-connector.version>
+		
 		<junit.version>4.13.2</junit.version>
 		<mockito.version>3.8.0</mockito.version>
 		<h2.version>1.4.200</h2.version>
@@ -28,10 +30,12 @@
 		<selenium.version>3.8.1</selenium.version>
 		<selenium-driver.version>3.8.1</selenium-driver.version>
 		<phantomjs.version>1.4.4</phantomjs.version>
+		
 		<logback-core.version>1.2.3</logback-core.version>
 		<logback-classic.version>1.2.3</logback-classic.version>
-		<slf4j-api.version>1.7.30</slf4j-api.version>
+		<slf4j.version>1.7.30</slf4j.version>
 		<HikariCP.version>4.0.3</HikariCP.version>
+		
 		<javax.servlet-api.version>4.0.1</javax.servlet-api.version>
 		<jstl.version>1.2</jstl.version>
 	</properties>
@@ -59,12 +63,24 @@
 	</build>
 
 	<dependencies>
-		
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${spring-webmvc.version}</version>
+			<version>${spring.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -144,7 +160,14 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j-api.version}</version>
+			<version>${slf4j.version}</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->

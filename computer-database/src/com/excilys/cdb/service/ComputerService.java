@@ -3,6 +3,7 @@ package com.excilys.cdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,8 @@ import com.excilys.cdb.model.Page;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerService {
 
-	ComputerDAO computerDAO = new ComputerDAO();
+	@Autowired
+	ComputerDAO computerDAO;
 	
 	public List<Optional<Computer>> getInfoComputer() {
 		return computerDAO.findAllComputers();

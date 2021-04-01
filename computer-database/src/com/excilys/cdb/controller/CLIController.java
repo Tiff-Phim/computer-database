@@ -5,20 +5,29 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 import com.excilys.cdb.view.Menu;
 import com.excilys.cdb.view.MenuCommand;
 
+@Controller
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CLIController {
 
 	private static final String PREVIOUS_PAGE = "-";
 	private static final String NEXT_PAGE = "+";
 	private static final String QUIT_PAGINATED_MENU = "0";
 
-	private CompanyController companyController = new CompanyController();
-	private ComputerController computerController = new ComputerController();
+	@Autowired
+	private CompanyController companyController;
+	@Autowired
+	private ComputerController computerController;
 
 	private Menu menu = new Menu();
 	private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");

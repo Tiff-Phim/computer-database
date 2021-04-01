@@ -55,8 +55,9 @@ public class DashboardServlet extends HttpServlet {
 
 	@Autowired
 	private ComputerService computerService;
-
-	private static ComputerMapper mapper = new ComputerMapper();
+	
+	@Autowired
+	private ComputerMapper mapper;
 	private int pageSize = 10;
 	
 	private static Logger logger = LoggerFactory.getLogger(DashboardServlet.class);
