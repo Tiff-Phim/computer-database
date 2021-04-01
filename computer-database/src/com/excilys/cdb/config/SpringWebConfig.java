@@ -25,6 +25,7 @@ public class SpringWebConfig implements WebApplicationInitializer {
 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
 	    context.register(SpringWebConfig.class);
 	    context.setServletContext(servletContext);
+	    context.close();
 	}
 	
 	@Bean

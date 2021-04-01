@@ -17,8 +17,6 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.mapper.ComputerMapper;
@@ -26,7 +24,6 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 
 @Repository
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComputerDAO {
 
 	private static final String SQL_GET_ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
