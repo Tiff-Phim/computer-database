@@ -26,6 +26,8 @@ public class CompanyDAO {
 	private static final String SQL_GET_ALL_COMPANIES = "SELECT id, name FROM company";
 	private static final String SQL_GET_COMPANY_BY_NAME = "SELECT id, name FROM company WHERE name=?";
 	private static final String SQL_GET_COMPANY_PAGE = "SELECT id, name FROM company ORDER BY id LIMIT ? OFFSET ?";
+	private static final String SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY = "DELETE FROM computer WHERE company_id=?";
+	private static final String SQL_DELETE_COMPANY_BY_ID = "DELETE FROM company WHERE id=?";
 
 	private static Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 	
@@ -44,14 +46,14 @@ public class CompanyDAO {
 		List<Optional<Company>> companyList = new ArrayList<>();
 		try (Connection con = dataSource.getConnection();
 				Statement statement = con.createStatement()) {
-			logger.debug("CompanyDAO: getting all companies ...");
+			logger.debug("Getting all companies ...");
 			ResultSet results = null;
 			results = statement.executeQuery(SQL_GET_ALL_COMPANIES);
 			while (results.next()) {
 				companyList.add(mapper.mapToCompany(results));
 			}
 		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get companies.", e);
+			logger.error("Could not get companies.", e);
 		}
 		return companyList;
 	}
@@ -66,13 +68,13 @@ public class CompanyDAO {
 		Optional<Company> company = Optional.empty();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_BY_NAME)) {
-			logger.debug("CompanyDAO: getting company by name ...");
+			logger.debug("Getting company by name ...");
 			preparedStatement.setString(1, companyName);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			company = mapper.mapToCompany(resultSet);
 		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get company by name.", e);
+			logger.error("Could not get company by name.", e);
 		}
 		return company;
 	}
@@ -87,7 +89,7 @@ public class CompanyDAO {
 		ArrayList<Optional<Company>> companyList = new ArrayList<>();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_PAGE)) {
-			logger.debug("CompanyDAO: getting company by page ...");
+			logger.debug("Getting company by page ...");
 			preparedStatement.setInt(1, page.getSize());
 			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -96,9 +98,37 @@ public class CompanyDAO {
 				page.setContent(companyList);
 			}
 		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get company pages.", e);
+			logger.error("Could not get company pages.", e);
 		}
 		return page;
+	}
+	
+	/**
+	 * Delete company by id, also delete computer associated with the company to delete.
+	 * 
+	 * @param id
+	 * @throws SQLException
+	 */
+	public void deleteCompanyById(long id) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		try (PreparedStatement deleteComputer = connection.prepareStatement(SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY);
+				PreparedStatement deleteCompany = connection.prepareStatement(SQL_DELETE_COMPANY_BY_ID);) {
+			connection.setAutoCommit(false);
+			deleteComputer.setLong(1, id);
+			deleteComputer.executeUpdate();
+			deleteCompany.setLong(1, id);
+			deleteCompany.executeUpdate();
+			connection.commit();
+		} catch (SQLException e) {
+			if (connection != null) {
+				try {
+					logger.error("Transaction is being rolled back ", e);
+					connection.rollback();
+				} catch (SQLException exp) {
+					logger.error("Couldn't rollback transaction ", exp);
+				}
+			}
+		}
 	}
 
 }
