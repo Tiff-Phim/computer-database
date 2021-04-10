@@ -1,99 +1,65 @@
 package com.excilys.cdb.dao;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.sql.DataSource;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.cdb.mapper.ComputerMapper;
+import com.excilys.cdb.mapper.ComputerRowMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
 
 @Repository
 public class ComputerDAO {
 
-	private static final String SQL_GET_ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
-			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id";
-	private static final String SQL_GET_PAGE = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued,"
-			+ " computer.company_id FROM computer LEFT JOIN company ON company.id = computer.company_id ORDER BY SORT_BY SORT_ORDER LIMIT ? OFFSET ?";
+	private static final String SQL_GET_TOTAL = "SELECT COUNT(*) FROM computer";
+
 	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
-			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id=?";
-	private static final String SQL_GET_COMPUTER_BY_NAME = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
-			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.name=?";
-	private static final String SQL_CREATE_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?, ?, ?, ?)";
-	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET computer.name=?, computer.introduced=?, computer.discontinued=?"
-			+ ", computer.company_id=? WHERE computer.id=?";
-	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id=?";
+			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id = :id";
+
+	private static final String SQL_CREATE_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (:name, :introduced, :discontinued, :companyId)";
+
+	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET computer.name = :name, computer.introduced = :introduced, computer.discontinued = :discontinued"
+			+ ", computer.company_id = :companyId WHERE computer.id = :id";
+
+	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id = :id";
+
 	private static final String SQL_SEARCH_COMPUTER_BY_NAME_FILTER = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued, computer.company_id"
-			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id"
-			+ " WHERE (computer.name like ?) OR (company.name like ?)"
-			+ " ORDER BY SORT_BY SORT_ORDER LIMIT ? OFFSET ?";
-	
+			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id";
+
+	private static final String SQL_SEARCH_BY_COMPUTER_AND_COMPANY_NAMES = " WHERE (computer.name LIKE :search) OR (company.name LIKE :search)";
+	private static final String SQL_ORDER_BY_AND_OFFSET = " ORDER BY :filter :order LIMIT :size OFFSET :offset";
+
 	private static Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-	@Autowired
-	private DataSource dataSource;
-	@Autowired
-	private ComputerMapper mapper;
+	private final JdbcTemplate jdbcTemplate;
+	private final NamedParameterJdbcTemplate namedParamJdbcTemplate;
+	private final ComputerRowMapper mapper;
 
-	/**
-	 * Lists all computers present in database.
-	 * 
-	 * @return computers all the computers stored in database
-	 * @throws SQLException
-	 */
-	public List<Optional<Computer>> findAllComputers() {
-		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
-			logger.debug("ComputerDAO: getting all computers ...");
-			ResultSet resultSet = statement.executeQuery(SQL_GET_ALL_COMPUTERS);
-			while (resultSet.next()) {
-				computerList.add(mapper.mapToComputer(resultSet));
-			}
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get computers.", e);
-		}
-		return computerList;
+	public ComputerDAO(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParamJdbcTemplate,
+			ComputerRowMapper mapper) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.namedParamJdbcTemplate = namedParamJdbcTemplate;
+		this.mapper = mapper;
 	}
 
 	/**
-	 * List computers with pages.
+	 * Get total of computers.
 	 * 
-	 * @param page
-	 * @return page of computers
+	 * @return total
 	 */
-	public Page<Computer> getComputerPaginated(Page<Computer> page) {
-		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection
-						.prepareStatement(SQL_GET_PAGE.replaceFirst("SORT_ORDER", page.getOrder().name())
-								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
-			logger.debug("ComputerDAO: getting all computers paginated ...");
-			preparedStatement.setInt(1, page.getSize());
-			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				computerList.add(mapper.mapToComputer(resultSet));
-				page.setContent(computerList);
-			}
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get computer pages.", e);
-		}
-		return page;
+	public int getTotalComputers() {
+		logger.debug("Counting total of computers ...");
+		return jdbcTemplate.queryForObject(SQL_GET_TOTAL, Integer.class);
 	}
 
 	/**
@@ -103,67 +69,46 @@ public class ComputerDAO {
 	 * @throws SQLException
 	 */
 	public Optional<Computer> findComputerById(long computerId) {
-		Optional<Computer> computer = Optional.empty();
-		try (Connection con = dataSource.getConnection();
-				PreparedStatement prepStatement = con.prepareStatement(SQL_GET_COMPUTER_BY_ID)) {
-			logger.debug("ComputerDAO: getting computer by id ...");
-			prepStatement.setLong(1, computerId);
-			ResultSet resultSet = prepStatement.executeQuery();
-			resultSet.next();
-			computer = mapper.mapToComputer(resultSet);
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get computer by id.", e);
-		}
-		return computer;
+		logger.debug("Searching for computer with id " + computerId);
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("id", computerId);
+		Computer computer = namedParamJdbcTemplate.queryForObject(SQL_GET_COMPUTER_BY_ID, parameters, mapper);
+		return Optional.ofNullable(computer);
 	}
 
 	/**
-	 * Find computer by name.
-	 * 
-	 * @param name of the computer to find
-	 * @return computer
-	 */
-	public Optional<Computer> findComputerByName(String name) {
-		Optional<Computer> computer = Optional.empty();
-		try (Connection con = dataSource.getConnection();
-				PreparedStatement prepStatement = con.prepareStatement(SQL_GET_COMPUTER_BY_NAME)) {
-			logger.debug("ComputerDAO: getting computer by name ...");
-			prepStatement.setString(1, name);
-			ResultSet resultSet = prepStatement.executeQuery();
-			resultSet.next();
-			computer = mapper.mapToComputer(resultSet);
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get computer by name.", e);
-		}
-		return computer;
-	}
-	
-	/**
-	 * List computers by pages with name filter. The filter is on both computer and company names.
+	 * List computers by pages with name filter. The filter is on both computer and
+	 * company names.
 	 * 
 	 * @param page
 	 * @param filter
 	 * @return page of computers
 	 */
-	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
-		List<Optional<Computer>> computerList = new ArrayList<>();
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection
-						.prepareStatement(SQL_SEARCH_COMPUTER_BY_NAME_FILTER.replaceFirst("SORT_ORDER", page.getOrder().name())
-								.replaceFirst("SORT_BY", page.getFilter().getAttribute()))) {
-			logger.debug("ComputerDAO: getting all computers search by name filter with pagination ...");
-			preparedStatement.setString(1, "%" + filter + "%");
-			preparedStatement.setString(2, "%" + filter + "%");
-			preparedStatement.setInt(3, page.getSize());
-			preparedStatement.setInt(4, (page.getNumber() - 1) * page.getSize());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				computerList.add(mapper.mapToComputer(resultSet));
-				page.setContent(computerList);
-			}
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not get computer matching the name " + filter, e);
-		}
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String search) {
+		logger.debug("Searching computers like " + search);
+		String query = (SQL_SEARCH_COMPUTER_BY_NAME_FILTER + SQL_SEARCH_BY_COMPUTER_AND_COMPANY_NAMES
+				+ SQL_ORDER_BY_AND_OFFSET).replaceFirst(":filter", page.getFilter().getAttribute())
+						.replaceFirst(":order", page.getOrder().name());
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("size", page.getSize())
+				.addValue("offset", (page.getNumber() - 1) * page.getSize()).addValue("search", "%" + search + "%");
+		List<Computer> computerList = namedParamJdbcTemplate.query(query, parameters, mapper);
+		page.setContent(computerList.stream().map(Optional::ofNullable).collect(Collectors.toList()));
+		return page;
+	}
+
+	/**
+	 * List computers by pages.
+	 * 
+	 * @param page
+	 * @return page of computers
+	 */
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page) {
+		String query = SQL_SEARCH_COMPUTER_BY_NAME_FILTER
+				+ SQL_ORDER_BY_AND_OFFSET.replaceFirst(":filter", page.getFilter().getAttribute())
+						.replaceFirst(":order", page.getOrder().name());
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("size", page.getSize()).addValue("offset",
+				(page.getNumber() - 1) * page.getSize());
+		List<Computer> computerList = namedParamJdbcTemplate.query(query, parameters, mapper);
+		page.setContent(computerList.stream().map(Optional::ofNullable).collect(Collectors.toList()));
 		return page;
 	}
 
@@ -174,26 +119,10 @@ public class ComputerDAO {
 	 */
 	public void createComputer(Computer computer) {
 		if (computer != null) {
-			try (Connection connection = dataSource.getConnection();
-					PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_COMPUTER)) {
-				logger.debug("ComputerDAO: creating new computer ...");
-				initPreparedStatement(preparedStatement, computer);
-				preparedStatement.setString(1, computer.getName());
-				if (computer.getIntroduced() != null) {
-					preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
-				}
-				if (computer.getDiscontinued() != null) {
-					preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
-				}
-				if (computer.getCompany().getId() != 0l) {
-					preparedStatement.setLong(4, computer.getCompany().getId());
-				} else {
-					preparedStatement.setString(4, null);
-				}
-				preparedStatement.executeUpdate();
-			} catch (SQLException e) {
-				logger.error("Error occur in ComputerDAO, could not create computer, nothing added to database.", e);
-			}
+			logger.debug("Creating computer " + computer);
+			SqlParameterSource parameters = new BeanPropertySqlParameterSource(computer);
+			namedParamJdbcTemplate.update(SQL_CREATE_COMPUTER, parameters);
+			logger.info("Computer succesfully added to the database.");
 		}
 	}
 
@@ -204,24 +133,11 @@ public class ComputerDAO {
 	 * @param computerId the id of the computer to update
 	 * @throws SQLException
 	 */
-	public void updateComputerById(Computer computer, long computerId) {
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_COMPUTER_BY_ID)) {
-			logger.debug("ComputerDAO: updating computer ...");
-			preparedStatement.setString(1, computer.getName());
-			preparedStatement.setDate(2, Date.valueOf(computer.getIntroduced()));
-			preparedStatement.setDate(3, Date.valueOf(computer.getDiscontinued()));
-
-			if (computer.getCompany().getId() != 0l) {
-				preparedStatement.setLong(4, computer.getCompany().getId());
-			} else {
-				preparedStatement.setString(4, null);
-			}
-			preparedStatement.setLong(5, computerId);
-			preparedStatement.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not update computer.", e);
-		}
+	public void updateComputerById(Computer computer, long id) {
+		logger.debug("Updating computer with id " + id);
+		SqlParameterSource parameters = new BeanPropertySqlParameterSource(computer);
+		namedParamJdbcTemplate.update(SQL_UPDATE_COMPUTER_BY_ID, parameters);
+		logger.info("Computer succesfully updated.");
 	}
 
 	/**
@@ -231,48 +147,9 @@ public class ComputerDAO {
 	 * @throws SQLException
 	 */
 	public void deleteComputerById(long computerId) {
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_COMPUTER_BY_ID)) {
-			logger.debug("ComputerDAO: deleting computer ...");
-			preparedStatement.setLong(1, computerId);
-			int status = preparedStatement.executeUpdate();
-			if (status == 0) {
-				throw new SQLException();
-			}
-		} catch (SQLException e) {
-			logger.error("Error occur in ComputerDAO, could not delete computer.", e);
-		}
-	}
-
-	/**
-	 * Init a prepared statement for a computer.
-	 * 
-	 * @param preparedStatement
-	 * @param computer
-	 * @throws SQLException
-	 */
-	private void initPreparedStatement(PreparedStatement preparedStatement, Computer computer) throws SQLException {
-		preparedStatement.setNString(1, computer.getName());
-		initPreparedStatementDate(preparedStatement, computer.getIntroduced(), 2);
-		initPreparedStatementDate(preparedStatement, computer.getDiscontinued(), 3);
-		preparedStatement.setLong(4, computer.getCompany().getId());
-	}
-
-	/**
-	 * Init date for preparedStatement.
-	 * 
-	 * @param preparedStatement
-	 * @param date
-	 * @param pos
-	 * @throws SQLException
-	 */
-	private void initPreparedStatementDate(PreparedStatement preparedStatement, LocalDate date, int pos)
-			throws SQLException {
-		if (date != null) {
-			preparedStatement.setDate(pos, Date.valueOf(date));
-		} else {
-			preparedStatement.setNull(pos, Types.DATE);
-		}
+		logger.debug("Deleting computer with id " + computerId);
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("id", computerId);
+		namedParamJdbcTemplate.update(SQL_DELETE_COMPUTER_BY_ID, parameters);
 	}
 
 }

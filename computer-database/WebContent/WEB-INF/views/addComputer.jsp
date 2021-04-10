@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,7 +15,7 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="DashboardServlet">
+			<a class="navbar-brand" href="dashboard">
 				Application - Computer Database </a>
 		</div>
 	</header>
@@ -24,35 +25,29 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Add Computer</h1>
-					<form id="addComputerForm" action="AddComputerServlet" method="POST">
+					<form:form id="addComputerForm" action="addComputer" method="POST" modelAttribute="computer">
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> <input
-									type="text" class="form-control" id="computerName"
-									name="computerName" placeholder="Computer name" required>
-								<span class="error"><c:out value="${errors['computerName']}" /></span>
+								<label for="computerName">Computer name</label> 
+								<form:input type="text" class="form-control" id="name" path="name" placeholder="Computer name"/>
+								<form:errors path="name" cssClass="error" />
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> <input
-									type="date" class="form-control" id="introduced"
-									name="introduced" placeholder="Introduced date">
+								<label for="introduced">Introduced date</label>
+								<form:input type="date" class="form-control" id="introduced" path="introduced" placeholder="Introduced date"/>
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <input
-									type="date" class="form-control" id="discontinued"
-									name="discontinued" placeholder="Discontinued date"> <span
-									class="error"><c:out value="${errors['discontinued']}" /></span>									
+								<label for="discontinued">Discontinued date</label>
+								<form:input type="date" class="form-control" id="discontinued" path="discontinued" placeholder="Discontinued date"/>
+								<form:errors path="discontinued" cssClass="error"/>									
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> 
-								<select class="form-control" id="companyId" name="companyId">
-									<option value="0">Please select a company</option>
-									<c:forEach var="company" items="${companyList}">
-										<option value="${ company.getId()}"><c:out
-												value="${ company.getName() }" /></option>
-									</c:forEach>
-								</select>
-								<span class="error"><c:out value="${errors['companyId']}" /></span>
+								<label for="companyId">Company</label>
+								<form:select class="form-control" id="companyId" path="companyId">
+									<form:option selected="true" value="0" label="Please select a company"/>
+									<form:options items="${companyList}" itemValue="id" itemLabel="name"/>
+								</form:select>
+								<form:errors path="companyId" cssClass="error"/>	
 							</div>
 						</fieldset>
 						
@@ -63,9 +58,9 @@
 						
 						<div class="actions pull-right">
 							<input type="submit" value="Add" class="btn btn-primary">
-							or <a href="DashboardServlet" class="btn btn-default">Cancel</a>
+							or <a href="dashboard" class="btn btn-default">Cancel</a>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>
@@ -73,7 +68,7 @@
 
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	<script src="js/addComputerValidator.js"></script>
+	<script src="js/computerValidator.js"></script>
 	
 </body>
 </html>

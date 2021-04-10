@@ -3,6 +3,8 @@ package com.excilys.cdb.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Page<E> class defines a page object.
@@ -14,7 +16,8 @@ import java.util.Optional;
  */
 public class Page<E> {
 
-	private static final int DEFAULT_PAGE_SIZE = 10;
+	private static final int OFFSET = 5;
+	public static final int DEFAULT_PAGE_SIZE = 10;
 	public static final FilterAttribute DEFAULT_PAGE_FILTER = FilterAttribute.COMPUTER_ID;
 	public static final SortingOrder DEFAULT_SORTING_ORDER = SortingOrder.ASC;
 
@@ -127,6 +130,17 @@ public class Page<E> {
 
 	public void setPreviousPage(Page<E> previousPage) {
 		this.previousPage = previousPage;
+	}
+	
+	public List<Integer> listPageNumbers(int pageNumber, int totalPages) {
+		int start = pageNumber - (OFFSET / 2);
+		start = Math.max(start, 1);
+		int end = start + OFFSET - 1;
+		if (end > totalPages) {
+			end = totalPages;
+			start = end - OFFSET + 1;
+		}
+		return IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <!DOCTYPE html>
 <html>
@@ -16,7 +17,7 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="DashboardServlet">
+			<a class="navbar-brand" href="dashboard">
 				Application - Computer Database </a>
 		</div>
 	</header>
@@ -29,7 +30,7 @@
 			</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
-					<form id="searchForm" action="DashboardServlet" method="GET" class="form-inline">
+					<form id="searchForm" action="dashboard" method="GET" class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
 							class="form-control" placeholder="Search name" /> 
@@ -39,18 +40,18 @@
 				</div>
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer"
-						href="AddComputerServlet">Add Computer</a> <a
+						href="addComputer">Add Computer</a> <a
 						class="btn btn-default" id="editComputer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
 			</div>
 		</div>
 
-		<form id="deleteForm" action="DeleteComputerServlet" method="POST">
+		<form id="deleteForm" action="dashboard" method="POST">
 			<input type="hidden" name="selection" value="">
 		</form>
 		
-		<form id="sortForm" action="#" method="POST">
+		<form id="sortForm" action="dashboard" method="POST">
 			<input type="hidden" name="filter" value="">
 		</form>
 
@@ -88,7 +89,7 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="${ computer.getId() }"></td>
-							<td><a href="<c:url value="EditComputerServlet"><c:param name="computerId" 
+							<td><a href="<c:url value="editComputer"><c:param name="computerId" 
 								value="${ computer.getId() }"/></c:url>"><c:out
 										value="${computer.getName() }" /></a></td>									
 							<td><c:out value="${computer.getIntroduced() }" /></td>
@@ -126,7 +127,7 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-			<form action="DashboardServlet">
+			<form action="dashboard"  method="POST">
 				<button name="pageSize" type="submit" class="btn btn-default" value="10">10</button>
 				<button name="pageSize" type="submit" class="btn btn-default" value="50">50</button>
 				<button name="pageSize" type="submit" class="btn btn-default" value="100">100</button>

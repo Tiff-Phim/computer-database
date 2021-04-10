@@ -1,9 +1,7 @@
 package com.excilys.cdb.service;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.dao.ComputerDAO;
@@ -13,27 +11,26 @@ import com.excilys.cdb.model.Page;
 @Service
 public class ComputerService {
 
-	@Autowired
-	ComputerDAO computerDAO;
+	private final ComputerDAO computerDAO;
 	
-	public List<Optional<Computer>> getInfoComputer() {
-		return computerDAO.findAllComputers();
+	public ComputerService(ComputerDAO computerDAO) {
+		this.computerDAO = computerDAO;
 	}
 	
-	public Page<Computer> getComputerPaginated(Page<Computer> page) {
-		return computerDAO.getComputerPaginated(page);
+	public int getTotal() {
+		return this.computerDAO.getTotalComputers();
 	}
 
 	public Optional<Computer> getComputerById(long id) {
 		return computerDAO.findComputerById(id);
 	}
 	
-	public Optional<Computer> getComputerByName(String name) {
-		return computerDAO.findComputerByName(name);
-	}
-	
 	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
 		return computerDAO.getComputerPaginatedByNameFilter(page, filter);
+	}
+	
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page) {
+		return computerDAO.getComputerPaginatedByNameFilter(page);
 	}
 
 	public void addComputer(Computer computer) {

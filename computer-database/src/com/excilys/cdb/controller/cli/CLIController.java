@@ -1,11 +1,10 @@
-package com.excilys.cdb.controller;
+package com.excilys.cdb.controller.cli;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.model.Company;
@@ -21,17 +20,20 @@ public class CLIController {
 	private static final String NEXT_PAGE = "+";
 	private static final String QUIT_PAGINATED_MENU = "0";
 
-	@Autowired
-	private CompanyController companyController;
-	@Autowired
-	private ComputerController computerController;
+	private final CompanyController companyController;
+	private final ComputerController computerController;
 
 	private Menu menu = new Menu();
 	private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private static int pageNumber = 1;
 	
 	private Scanner sc = new Scanner(System.in);
-
+	
+	public CLIController(CompanyController companyController, ComputerController computerController) {
+		this.companyController = companyController;
+		this.computerController = computerController;
+	}
+	
 	/**
 	 * Run CLIController.
 	 * 
@@ -48,23 +50,17 @@ public class CLIController {
 	private void processCommand(int command) throws SQLException {
 		MenuCommand menuCommand = MenuCommand.fromCommand(command);
 		switch (menuCommand) {
-		case LIST_ALL_COMPUTER:
-			menu.showComputers(computerController.getAll());
-			break;
 		case LIST_COMPUTER:
 			Page<Computer> page = new Page<Computer>(10, pageNumber);
-			menu.showComputerPaginated(computerController.getComputerPaginated(page));
+			menu.showComputerPaginated(computerController.getComputerPaginatedByNameFilter(page));
 			System.out.println("Please use - or + to navigate through pages ...");
 			sc.nextLine();
 			String event = sc.nextLine();
 			do {
-				handlePagination(event, computerController.getComputerPaginated(page));
+				handlePagination(event, computerController.getComputerPaginatedByNameFilter(page));
 				System.out.println("Please use - or + to navigate through pages ...");
 				event = sc.nextLine();
 			} while (event.length() > 0);
-			break;
-		case LIST_ALL_COMPANY:
-			menu.showCompanies(companyController.getAll());
 			break;
 		case LIST_COMPANY:
 			Page<Company> companyPage = new Page<Company>(5, 1);
@@ -115,10 +111,10 @@ public class CLIController {
 	private <E> void handlePagination(String event, Page<Computer> page) throws SQLException {
 		switch (event) {
 		case PREVIOUS_PAGE:
-			menu.showComputerPaginated(computerController.getComputerPaginated(page.getPreviousPage()));
+			menu.showComputerPaginated(computerController.getComputerPaginatedByNameFilter(page.getPreviousPage()));
 			break;
 		case NEXT_PAGE:
-			menu.showComputerPaginated(computerController.getComputerPaginated(page.getNextPage()));
+			menu.showComputerPaginated(computerController.getComputerPaginatedByNameFilter(page.getNextPage()));
 			break;
 		case QUIT_PAGINATED_MENU:
 			break;

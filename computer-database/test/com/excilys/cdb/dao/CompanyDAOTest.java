@@ -30,12 +30,12 @@ public class CompanyDAOTest {
 		companyDAO = null;
 	}
 	
-	@Test
-	public void testFindCompanyByName() throws SQLException {
-		String companyName = "Netronics";
-		Optional<Company> company = companyDAO.findCompanyByName(companyName);		
-		assertEquals("Wrong company name", companyName, company.get().getName());
-	}
+//	@Test
+//	public void testFindCompanyByName() throws SQLException {
+//		String companyName = "Netronics";
+//		Optional<Company> company = companyDAO.findCompanyByName(companyName);		
+//		assertEquals("Wrong company name", companyName, company.get().getName());
+//	}
 	
 	@Test
 	public void testFindAllCompanies() throws SQLException {

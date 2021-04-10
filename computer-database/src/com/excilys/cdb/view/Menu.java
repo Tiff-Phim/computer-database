@@ -21,9 +21,7 @@ public class Menu {
 		CLITable st = new CLITable();
 		st.setShowVerticalLines(true);
 		st.setHeaders("Value", "Description");
-		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPUTER.value), MenuCommand.LIST_ALL_COMPUTER.description);
 		st.addRow(String.valueOf(MenuCommand.LIST_COMPUTER.value), MenuCommand.LIST_COMPUTER.description);
-		st.addRow(String.valueOf(MenuCommand.LIST_ALL_COMPANY.value), MenuCommand.LIST_ALL_COMPANY.description);
 		st.addRow(String.valueOf(MenuCommand.LIST_COMPANY.value), MenuCommand.LIST_COMPANY.description);
 		st.addRow(String.valueOf(MenuCommand.SHOW_COMPUTER_DETAIL.value), MenuCommand.SHOW_COMPUTER_DETAIL.description);
 		st.addRow(String.valueOf(MenuCommand.ADD_NEW_COMPUTER.value), MenuCommand.ADD_NEW_COMPUTER.description);

@@ -1,10 +1,7 @@
-package com.excilys.cdb.controller;
+package com.excilys.cdb.controller.cli;
 
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.model.Computer;
@@ -14,19 +11,26 @@ import com.excilys.cdb.service.ComputerService;
 @Controller
 public class ComputerController {
 
-	@Autowired
-	ComputerService computerService;
+	private final ComputerService computerService;
 	
-	public List<Optional<Computer>> getAll() throws SQLException {
-		return computerService.getInfoComputer();
+	public ComputerController(ComputerService computerService) {
+		this.computerService = computerService;
 	}
 	
-	public Page<Computer> getComputerPaginated(Page<Computer> page) throws SQLException {
-		return computerService.getComputerPaginated(page);
+	public int getTotal() {
+		return this.computerService.getTotal();
 	}
 	
 	public Optional<Computer> getComputerById(long id) {
 		return computerService.getComputerById(id);
+	}
+	
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String filter) {
+		return computerService.getComputerPaginatedByNameFilter(page, filter);
+	}
+	
+	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page) {
+		return computerService.getComputerPaginatedByNameFilter(page);
 	}
 	
 	public void insertComputer(Computer computer) {

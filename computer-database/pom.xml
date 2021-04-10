@@ -20,9 +20,8 @@
 
 		<!-- External dependencies versioning -->
 		<spring.version>5.3.5</spring.version>
-		<spring-jdbc.version>5.3.5</spring-jdbc.version>
 		<mysql-connector.version>8.0.23</mysql-connector.version>
-		
+
 		<junit.version>4.13.2</junit.version>
 		<mockito.version>3.8.0</mockito.version>
 		<h2.version>1.4.200</h2.version>
@@ -30,12 +29,11 @@
 		<selenium.version>3.8.1</selenium.version>
 		<selenium-driver.version>3.8.1</selenium-driver.version>
 		<phantomjs.version>1.4.4</phantomjs.version>
-		
-		<logback-core.version>1.2.3</logback-core.version>
-		<logback-classic.version>1.2.3</logback-classic.version>
+
+		<logback.version>1.2.3</logback.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<HikariCP.version>4.0.3</HikariCP.version>
-		
+
 		<javax.servlet-api.version>4.0.1</javax.servlet-api.version>
 		<jstl.version>1.2</jstl.version>
 	</properties>
@@ -64,9 +62,10 @@
 
 	<dependencies>
 
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
+			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
 			<exclusions>
 				<exclusion>
@@ -76,10 +75,10 @@
 			</exclusions>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
+			<artifactId>spring-jdbc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 
@@ -146,14 +145,14 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>${logback-core.version}</version>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>${logback-classic.version}</version>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -162,7 +161,7 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -190,6 +189,13 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>${jstl.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
 		</dependency>
 
 	</dependencies>

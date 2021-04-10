@@ -1,22 +1,18 @@
 package com.excilys.cdb.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.excilys.cdb.mapper.CompanyMapper;
+import com.excilys.cdb.mapper.CompanyRowMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Page;
 
@@ -24,17 +20,17 @@ import com.excilys.cdb.model.Page;
 public class CompanyDAO {
 
 	private static final String SQL_GET_ALL_COMPANIES = "SELECT id, name FROM company";
-	private static final String SQL_GET_COMPANY_BY_NAME = "SELECT id, name FROM company WHERE name=?";
-	private static final String SQL_GET_COMPANY_PAGE = "SELECT id, name FROM company ORDER BY id LIMIT ? OFFSET ?";
-	private static final String SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY = "DELETE FROM computer WHERE company_id=?";
-	private static final String SQL_DELETE_COMPANY_BY_ID = "DELETE FROM company WHERE id=?";
+	private static final String SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY = "DELETE FROM computer WHERE company_id = :id";
+	private static final String SQL_DELETE_COMPANY_BY_ID = "DELETE FROM company WHERE id = :id";
+	private static final String SQL_GET_COMPANY_PAGE = "SELECT id, name FROM company ORDER BY id LIMIT :size OFFSET :offset";
 
-	private static Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
+	private final NamedParameterJdbcTemplate jdbcTemplate;
+	private final CompanyRowMapper mapper;
 	
-	@Autowired
-	private DataSource dataSource;
-	@Autowired
-	private CompanyMapper mapper;
+	public CompanyDAO(NamedParameterJdbcTemplate jdbcTemplate, CompanyRowMapper mapper) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.mapper = mapper;
+	}
 
 	/**
 	 * Lists all companies present in database.
@@ -42,41 +38,9 @@ public class CompanyDAO {
 	 * @return companies all the companies stored in database
 	 * @throws SQLException
 	 */
-	public List<Optional<Company>> findAllCompanies() throws SQLException {
-		List<Optional<Company>> companyList = new ArrayList<>();
-		try (Connection con = dataSource.getConnection();
-				Statement statement = con.createStatement()) {
-			logger.debug("Getting all companies ...");
-			ResultSet results = null;
-			results = statement.executeQuery(SQL_GET_ALL_COMPANIES);
-			while (results.next()) {
-				companyList.add(mapper.mapToCompany(results));
-			}
-		} catch (SQLException e) {
-			logger.error("Could not get companies.", e);
-		}
-		return companyList;
-	}
-
-	/**
-	 * Show details for the company selected with its name.
-	 * 
-	 * @return company details
-	 * @throws SQLException
-	 */
-	public Optional<Company> findCompanyByName(String companyName) throws SQLException {
-		Optional<Company> company = Optional.empty();
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_BY_NAME)) {
-			logger.debug("Getting company by name ...");
-			preparedStatement.setString(1, companyName);
-			ResultSet resultSet = preparedStatement.executeQuery();
-			resultSet.next();
-			company = mapper.mapToCompany(resultSet);
-		} catch (SQLException e) {
-			logger.error("Could not get company by name.", e);
-		}
-		return company;
+	public List<Optional<Company>> findAllCompanies() throws DataAccessException {
+		List<Company> companyList = jdbcTemplate.query(SQL_GET_ALL_COMPANIES, mapper);
+		return companyList.stream().map(Optional::ofNullable).collect(Collectors.toList());
 	}
 	
 	/**
@@ -85,21 +49,12 @@ public class CompanyDAO {
 	 * @param page
 	 * @return page with list of companies
 	 */
-	public Page<Company> getCompanyPaginated(Page<Company> page) throws SQLException {
-		ArrayList<Optional<Company>> companyList = new ArrayList<>();
-		try (Connection connection = dataSource.getConnection();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COMPANY_PAGE)) {
-			logger.debug("Getting company by page ...");
-			preparedStatement.setInt(1, page.getSize());
-			preparedStatement.setInt(2, (page.getNumber() - 1) * page.getSize());
-			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				companyList.add(mapper.mapToCompany(resultSet));
-				page.setContent(companyList);
-			}
-		} catch (SQLException e) {
-			logger.error("Could not get company pages.", e);
-		}
+	public Page<Company> getCompanyPaginated(Page<Company> page) throws DataAccessException {
+		SqlParameterSource parameters = new MapSqlParameterSource()
+				.addValue("size", page.getSize())
+				.addValue("offset", (page.getNumber() - 1) * page.getSize());
+		List<Company> companyList = jdbcTemplate.query(SQL_GET_COMPANY_PAGE, parameters, mapper);
+		page.setContent(companyList.stream().map(Optional::ofNullable).collect(Collectors.toList()));
 		return page;
 	}
 	
@@ -109,26 +64,11 @@ public class CompanyDAO {
 	 * @param id
 	 * @throws SQLException
 	 */
-	public void deleteCompanyById(long id) throws SQLException {
-		Connection connection = dataSource.getConnection();
-		try (PreparedStatement deleteComputer = connection.prepareStatement(SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY);
-				PreparedStatement deleteCompany = connection.prepareStatement(SQL_DELETE_COMPANY_BY_ID);) {
-			connection.setAutoCommit(false);
-			deleteComputer.setLong(1, id);
-			deleteComputer.executeUpdate();
-			deleteCompany.setLong(1, id);
-			deleteCompany.executeUpdate();
-			connection.commit();
-		} catch (SQLException e) {
-			if (connection != null) {
-				try {
-					logger.error("Transaction is being rolled back ", e);
-					connection.rollback();
-				} catch (SQLException exp) {
-					logger.error("Couldn't rollback transaction ", exp);
-				}
-			}
-		}
+	@Transactional
+	public void deleteCompanyById(long id) throws DataAccessException {
+		SqlParameterSource parameters = new MapSqlParameterSource().addValue("id", id);
+		jdbcTemplate.update(SQL_DELETE_COMPUTER_REFERENCED_BY_COMPANY, parameters);
+		jdbcTemplate.update(SQL_DELETE_COMPANY_BY_ID, parameters);
 	}
 
 }

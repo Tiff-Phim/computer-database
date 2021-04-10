@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * and eventually the date when it was discontinued, and the manufacturer.
  * 
  * @author Tiffany PHIMMASANE
- * @version 0.2
+ * @version 0.3
  */
 public class Computer {
 
@@ -109,6 +109,13 @@ public class Computer {
 	 */
 	public Company getCompany() {
 		return company;
+	}
+	
+	public Long getCompanyId() {
+		if (company != null && (company.getId() != 0)) {
+			return company.getId();
+		}
+		return null;
 	}
 
 	public static class ComputerBuilder {

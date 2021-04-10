@@ -1,8 +1,5 @@
 package com.excilys.cdb.mapper;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -18,34 +15,6 @@ import com.excilys.cdb.model.Computer;
 
 @Component
 public class ComputerMapper {
-
-	private static final String ATTRIBUT_ID = "computer.id";
-	private static final String ATTRIBUT_COMPUTER_NAME = "computer.name";
-	private static final String ATTRIBUT_INTRODUCED = "computer.introduced";
-	private static final String ATTRIBUT_DISCONTINUED = "computer.discontinued";
-	private static final String ATTRIBUT_COMPANY_NAME = "company.name";
-	private static final String ATTRIBUT_COMPANY_ID = "computer.company_id";
-
-	/**
-	 * Makes the correspondence between a line from the database table (a ResultSet)
-	 * and a Company bean.
-	 * 
-	 * @param resultSet line from the database table
-	 * @return bean of the Company
-	 * @throws SQLException
-	 */
-	public Optional<Computer> mapToComputer(ResultSet resultSet) throws SQLException {
-		Company company = new Company.CompanyBuilder().setId(resultSet.getLong(ATTRIBUT_COMPANY_ID))
-				.setName(resultSet.getString(ATTRIBUT_COMPANY_NAME)).build();
-
-		Computer computer = new Computer.ComputerBuilder().setId(resultSet.getLong(ATTRIBUT_ID))
-				.setName(resultSet.getString(ATTRIBUT_COMPUTER_NAME))
-				.setIntroduced(convertToLocalDate(resultSet.getDate(ATTRIBUT_INTRODUCED)))
-				.setDiscontinued(convertToLocalDate(resultSet.getDate(ATTRIBUT_DISCONTINUED))).setCompany(company)
-				.build();
-
-		return Optional.ofNullable(computer);
-	}
 
 	public Computer mapToComputer(ComputerDTO computer) {
 		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computer.getCompanyName())).build();
@@ -87,29 +56,26 @@ public class ComputerMapper {
 	}
 
 	public Computer mapEditComputerDTOToComputer(EditComputerDTO computerDTO) {
-		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+		Company company = new Company.CompanyBuilder().build();
+		if (computerDTO.getCompanyId() != null) {
+			company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+		}
 
-		return new Computer.ComputerBuilder().setName(computerDTO.getComputerName())
-				.setIntroduced(LocalDate.parse(computerDTO.getIntroduced()))
-				.setDiscontinued(LocalDate.parse(computerDTO.getDiscontinued())).setCompany(company).build();
+		return new Computer.ComputerBuilder().setId(Long.valueOf(computerDTO.getId()))
+				.setName(computerDTO.getName())
+				.setIntroduced(computerDTO.getIntroduced().isEmpty() ? null : LocalDate.parse(computerDTO.getIntroduced()))
+				.setDiscontinued(computerDTO.getDiscontinued().isEmpty() ? null : LocalDate.parse(computerDTO.getDiscontinued()))
+				.setCompany(company).build();
 	}
 
 	public EditComputerDTO mapComputerToEditComputerDTO(Optional<Computer> computer) {
 		if (computer.isPresent()) {
 			return new EditComputerDTO(String.valueOf(computer.get().getId()), computer.get().getName(),
-					computer.get().getIntroduced() != null ? computer.get().getIntroduced().toString() : "", 
-					computer.get().getDiscontinued() != null ?	computer.get().getDiscontinued().toString() : "",
+					computer.get().getIntroduced() != null ? computer.get().getIntroduced().toString() : "",
+					computer.get().getDiscontinued() != null ? computer.get().getDiscontinued().toString() : "",
 					String.valueOf(computer.get().getCompany().getId()));
 		}
 		return null;
-	}
-
-	private LocalDate convertToLocalDate(Date date) {
-		LocalDate localDate = null;
-		if (date != null) {
-			localDate = date.toLocalDate();
-		}
-		return localDate;
 	}
 
 }
