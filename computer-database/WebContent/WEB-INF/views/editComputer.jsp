@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
     
@@ -16,7 +17,7 @@
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="dashboard"> Application - Computer Database </a>
+            <a class="navbar-brand" href="dashboard"><fmt:message key="label.home"/></a>
         </div>
     </header>
     <section id="main">
@@ -26,29 +27,30 @@
                     <div class="label label-default pull-right">
                         id: ${computer.getId() }
                     </div>
-                    <h1>Edit Computer</h1>
+                    <h1><fmt:message key="label.editComputer"/></h1>
 
                     <form:form id="editComputer" action="editComputer" method="POST" modelAttribute="computerToEdit">
                         <form:input type="hidden" value="${computer.getId() }" id="id" path="id"/>
                         <fieldset>
                             <div class="form-group">
-                                <label for="computerName">Computer name</label>
+                                <label for="computerName"><fmt:message key="label.computerName"/></label>
                                 <form:input type="text" class="form-control" id="computerName" path="name" placeholder="${computer.getName()}"/>
                                 <form:errors path="name" cssClass="error" />
                             </div>
                             <div class="form-group">
-                                <label for="introduced">Introduced date</label>
+                                <label for="introduced"><fmt:message key="label.introducedDate"/></label>
                                 <form:input type="date" class="form-control" id="introduced" path="introduced" placeholder="${ empty computer.getIntroduced() ?  'Introduced date' : computer.getIntroduced()}"/>
                             </div>
                             <div class="form-group">
-                                <label for="discontinued">Discontinued date</label>
+                                <label for="discontinued"><fmt:message key="label.discontinuedDate"/></label>
                                 <form:input type="date" class="form-control" id="discontinued" path="discontinued" placeholder="${ empty computer.getDiscontinued() ?  'Discontinued date' : computer.getDiscontinued()}"/>
                                 <form:errors path="discontinued" cssClass="error"/>	
                             </div> 
                             <div class="form-group">
-								<label for="companyId">Company</label>
+								<label for="companyId"><fmt:message key="label.companyName"/></label>
+								<fmt:message key="computer.company.invalid" var="pleaseSelect"/>
 								<form:select class="form-control" id="companyId" path="companyId">
-									<form:option selected="true" value="0" label="Please select a company"/>
+									<form:option selected="true" value="0" label="${pleaseSelect }"/>
 									<form:options items="${companyList}" itemValue="id" itemLabel="name"/>
 								</form:select>
 								<form:errors path="companyId" cssClass="error"/>
@@ -57,13 +59,13 @@
                         
                         <div class="alert alert-danger page-alert" id="alert-message" style="display: none;">
 							<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-							<strong>Too bad!</strong> Change a few things up and try submitting again. The introduced date must be before the discontinued date!
+							<fmt:message key="computer.discontinued.invalid"/>
 						</div>                        
                         
                         <div class="actions pull-right">
-                            <input type="submit" value="Edit" class="btn btn-primary">
-                            or
-                            <a href="dashboard" class="btn btn-default">Cancel</a>
+                            <input type="submit" value="<fmt:message key="label.edit"/>" class="btn btn-primary">
+                            <fmt:message key="label.or"/>
+                            <a href="dashboard" class="btn btn-default"><fmt:message key="label.cancel"/></a>
                         </div>
                     </form:form>
                 </div>

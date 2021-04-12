@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>Computer Database</title>
+<title><fmt:message key="label.title"/></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
@@ -17,8 +18,7 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="dashboard">
-				Application - Computer Database </a>
+			<a class="navbar-brand" href="dashboard"><fmt:message key="label.home"/></a>
 		</div>
 	</header>
 
@@ -26,23 +26,20 @@
 		<div class="container">
 			<h1 id="homeTitle">
 				<c:out value="${ computerTotal }" />
-				Computers found
+				<fmt:message key="label.computersFound"/>
 			</h1>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm" action="dashboard" method="GET" class="form-inline">
-
 						<input type="search" id="searchbox" name="search"
-							class="form-control" placeholder="Search name" /> 
-						<input type="submit" id="searchsubmit" value="Filter by name"
+							class="form-control" placeholder="<fmt:message key="label.searchName"/>" /> 
+						<input type="submit" id="searchsubmit" value="<fmt:message key="label.filterName"/>"
 							class="btn btn-primary" />
 					</form>
 				</div>
 				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer"
-						href="addComputer">Add Computer</a> <a
-						class="btn btn-default" id="editComputer" href="#"
-						onclick="$.fn.toggleEditMode();">Edit</a>
+					<a class="btn btn-success" id="addComputer" href="addComputer"><fmt:message key="label.addComputer"/></a> 
+					<a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();"><fmt:message key="label.edit"/></a>
 				</div>
 			</div>
 		</div>
@@ -62,22 +59,19 @@
 						<!-- Variable declarations for passing labels as parameters -->
 						<!-- Table header for Computer Name -->
 
-						<th class="editMode" style="width: 60px; height: 22px;"><input
-							type="checkbox" id="selectall" /> <span
-							style="vertical-align: top;"> - <a href="#"
-								id="deleteSelected" onclick="$.fn.deleteSelected();"> <i
-									class="fa fa-trash-o fa-lg"></i>
-							</a>
-						</span></th>						
-						<th>Computer name <a href="#" id="orderByComputerName" onclick="$.fn.orderBy('COMPUTER_NAME');">
+						<th class="editMode" style="width: 60px; height: 22px;"><input type="checkbox" id="selectall" /> 
+							<span style="vertical-align: top;"> - <a href="#" id="deleteSelected" onclick="$.fn.deleteSelected();"> <i class="fa fa-trash-o fa-lg"></i> </a>
+							</span>
+						</th>						
+						<th><fmt:message key="label.computerName"/><a href="#" id="orderByComputerName" onclick="$.fn.orderBy('COMPUTER_NAME');">
 						<i class="fa fa-fw fa-sort pull-right fa-clickable"></i></a></th>
-						<th>Introduced date <a href="#" id="orderByIntroducedDate" onclick="$.fn.orderBy('COMPUTER_INTRODUCED');">
+						<th><fmt:message key="label.introducedDate"/><a href="#" id="orderByIntroducedDate" onclick="$.fn.orderBy('COMPUTER_INTRODUCED');">
 						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 						<!-- Table header for Discontinued Date -->
-						<th>Discontinued date <a href="#" id="orderByDiscontinuedDate" onclick="$.fn.orderBy('COMPUTER_DISCONTINUED');">
+						<th><fmt:message key="label.discontinuedDate"/><a href="#" id="orderByDiscontinuedDate" onclick="$.fn.orderBy('COMPUTER_DISCONTINUED');">
 						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 						<!-- Table header for Company -->
-						<th>Company <a href="#" id="orderByCompanyrName" onclick="$.fn.orderBy('COMPANY_NAME');">
+						<th><fmt:message key="label.companyName"/><a href="#" id="orderByCompanyrName" onclick="$.fn.orderBy('COMPANY_NAME');">
 						<i class="fa fa-fw fa-sort pull-right"></i></a></th>
 
 					</tr>
@@ -102,15 +96,20 @@
 		</div>
 	</section>
 
-	<footer class="navbar-fixed-bottom">
-		<div class="container text-center">
+	<footer class="navbar-fixed-bottom">	
+		<div class="container text-center">			
+			<div class="btn-group btn-group-sm pull-left" role="group" id="language">
+               <a class="dropdown-item" href="?lang=en"><fmt:message key="label.lang.en"/></a> 
+               <a class="dropdown-item" href="?lang=fr"><fmt:message key="label.lang.fr"/></a>
+            </div>
+
 			<ul class="pagination">
 				
 				<li><a href="?page=${1}" aria-label="First"> <span
 						aria-hidden="true">&laquo;</span>
 				</a></li>
 				<c:if test="${ pageNumber > 1 }">
-					<li><a href="?page=${pageNumber > 1 ? pageNumber - 1 : 1}" aria-label="Previous"> Previous </a></li>
+					<li><a href="?page=${pageNumber > 1 ? pageNumber - 1 : 1}" aria-label="Previous"> <fmt:message key="label.previous"/></a></li>
 				</c:if>
 				
 				<c:forEach var="number" items="${listPageNumbers}">
@@ -118,7 +117,7 @@
 				</c:forEach>
 				
 				<c:if test="${ pageNumber < pageTotal }">
-					<li><a href="?page=${pageNumber + 1}" aria-label="Next"> Next </a></li>
+					<li><a href="?page=${pageNumber + 1}" aria-label="Next"> <fmt:message key="label.next"/> </a></li>
 				</c:if>
 				
 				<li><a href="?page=${ pageTotal }" aria-label="Last"> <span
@@ -140,6 +139,12 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/dashboard.js"></script>
+	
+	<script type="text/javascript">
+		var messages = new Array();
+		messages["view"] = "<fmt:message key="label.view" />";
+		messages["edit"] = "<fmt:message key="label.edit" />";
+	</script>
 
 </body>
 </html>
