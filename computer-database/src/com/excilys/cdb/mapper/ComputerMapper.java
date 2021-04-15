@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.excilys.cdb.dto.AddComputerDTO;
-import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.dto.EditComputerDTO;
+import com.excilys.cdb.dto.web.AddComputerDTO;
+import com.excilys.cdb.dto.web.ComputerDTO;
+import com.excilys.cdb.dto.web.EditComputerDTO;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 

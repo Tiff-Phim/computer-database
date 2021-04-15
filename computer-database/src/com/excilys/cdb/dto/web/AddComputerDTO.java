@@ -1,12 +1,15 @@
-package com.excilys.cdb.dto;
+package com.excilys.cdb.dto.web;
+
+import java.io.Serializable;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class AddComputerDTO {
+public class AddComputerDTO implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	@NotEmpty(message = "{computer.name.required}")
 	@Pattern(regexp = "^[a-zA-Z].*", message = "{computer.name.invalid}")
 	private String name;

@@ -34,8 +34,8 @@ public class Page<E> {
 	}
 
 	public enum FilterAttribute {
-		COMPANY_NAME("company.name"), COMPUTER_NAME("computer.name"), COMPUTER_ID("computer.id"), COMPUTER_INTRODUCED(
-				"computer.introduced"), COMPUTER_DISCONTINUED("computer.discontinued");
+		COMPANY_NAME("company"), COMPUTER_NAME("name"), COMPUTER_ID("id"), COMPUTER_INTRODUCED(
+				"introduced"), COMPUTER_DISCONTINUED("discontinued");
 
 		private String attribute;
 

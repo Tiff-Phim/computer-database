@@ -1,55 +1,44 @@
 package com.excilys.cdb.dao;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.cdb.mapper.ComputerRowMapper;
+import com.excilys.cdb.dto.dao.ComputerEntity;
+import com.excilys.cdb.mapper.dao.ComputerDAOMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Page;
+import com.excilys.cdb.model.Page.SortingOrder;
 
 @Repository
 public class ComputerDAO {
 
-	private static final String SQL_GET_TOTAL = "SELECT COUNT(*) FROM computer";
-
-	private static final String SQL_GET_COMPUTER_BY_ID = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued,"
-			+ " computer.company_id, company.name FROM computer LEFT JOIN company ON company.id = computer.company_id WHERE computer.id = :id";
-
-	private static final String SQL_CREATE_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (:name, :introduced, :discontinued, :companyId)";
-
-	private static final String SQL_UPDATE_COMPUTER_BY_ID = "UPDATE computer SET computer.name = :name, computer.introduced = :introduced, computer.discontinued = :discontinued"
-			+ ", computer.company_id = :companyId WHERE computer.id = :id";
-
-	private static final String SQL_DELETE_COMPUTER_BY_ID = "DELETE FROM computer WHERE id = :id";
-
-	private static final String SQL_SEARCH_COMPUTER_BY_NAME_FILTER = "SELECT computer.id, computer.name, company.name, computer.introduced, computer.discontinued, computer.company_id"
-			+ " FROM computer LEFT JOIN company ON company.id = computer.company_id";
-
-	private static final String SQL_SEARCH_BY_COMPUTER_AND_COMPANY_NAMES = " WHERE (computer.name LIKE :search) OR (company.name LIKE :search)";
-	private static final String SQL_ORDER_BY_AND_OFFSET = " ORDER BY :filter :order LIMIT :size OFFSET :offset";
-
 	private static Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-	private final JdbcTemplate jdbcTemplate;
-	private final NamedParameterJdbcTemplate namedParamJdbcTemplate;
-	private final ComputerRowMapper mapper;
+	private final SessionFactory session;
+	private final EntityManager entityManager;
+	private final CriteriaBuilder criteriaBuilder;
+	private final ComputerDAOMapper mapper;
 
-	public ComputerDAO(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParamJdbcTemplate,
-			ComputerRowMapper mapper) {
-		this.jdbcTemplate = jdbcTemplate;
-		this.namedParamJdbcTemplate = namedParamJdbcTemplate;
+	public ComputerDAO(SessionFactory session, ComputerDAOMapper mapper) {
+		this.session = session;
+		this.entityManager = this.session.createEntityManager();
 		this.mapper = mapper;
+		this.criteriaBuilder = this.entityManager.getCriteriaBuilder();
 	}
 
 	/**
@@ -57,9 +46,12 @@ public class ComputerDAO {
 	 * 
 	 * @return total
 	 */
-	public int getTotalComputers() {
-		logger.debug("Counting total of computers ...");
-		return jdbcTemplate.queryForObject(SQL_GET_TOTAL, Integer.class);
+	public Long getTotalComputers() {
+		logger.debug("Counting total of computers ...");		
+		CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+		Root<ComputerEntity> computer = query.from(ComputerEntity.class);
+		query.select(criteriaBuilder.count(computer));
+		return entityManager.createQuery(query).getSingleResult();
 	}
 
 	/**
@@ -70,9 +62,10 @@ public class ComputerDAO {
 	 */
 	public Optional<Computer> findComputerById(long computerId) {
 		logger.debug("Searching for computer with id " + computerId);
-		SqlParameterSource parameters = new MapSqlParameterSource().addValue("id", computerId);
-		Computer computer = namedParamJdbcTemplate.queryForObject(SQL_GET_COMPUTER_BY_ID, parameters, mapper);
-		return Optional.ofNullable(computer);
+		CriteriaQuery<Computer> query = criteriaBuilder.createQuery(Computer.class);
+		Root<Computer> computer = query.from(Computer.class);
+		query.select(computer).where(criteriaBuilder.equal(computer.get("id"), computerId));
+		return Optional.ofNullable(entityManager.createQuery(query).getSingleResult());
 	}
 
 	/**
@@ -85,13 +78,21 @@ public class ComputerDAO {
 	 */
 	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page, String search) {
 		logger.debug("Searching computers like " + search);
-		String query = (SQL_SEARCH_COMPUTER_BY_NAME_FILTER + SQL_SEARCH_BY_COMPUTER_AND_COMPANY_NAMES
-				+ SQL_ORDER_BY_AND_OFFSET).replaceFirst(":filter", page.getFilter().getAttribute())
-						.replaceFirst(":order", page.getOrder().name());
-		SqlParameterSource parameters = new MapSqlParameterSource().addValue("size", page.getSize())
-				.addValue("offset", (page.getNumber() - 1) * page.getSize()).addValue("search", "%" + search + "%");
-		List<Computer> computerList = namedParamJdbcTemplate.query(query, parameters, mapper);
-		page.setContent(computerList.stream().map(Optional::ofNullable).collect(Collectors.toList()));
+		CriteriaQuery<ComputerEntity> query = criteriaBuilder.createQuery(ComputerEntity.class);
+		Root<ComputerEntity> computer = query.from(ComputerEntity.class);
+		criteriaBuilder.like(computer.get("name"), "%" + search + "%");
+		String filter = page.getFilter().getAttribute();
+		if (page.getOrder() == SortingOrder.ASC) {
+			page.setContent(entityManager
+					.createQuery(query.orderBy(criteriaBuilder.asc(computer.get(filter))))
+					.setFirstResult(page.getNumber() - 1 * page.getSize()).setMaxResults(page.getSize()).getResultList()
+					.stream().map(c -> mapper.mapToComputer(c)).map(Optional::ofNullable).collect(Collectors.toList()));
+		} else {
+			page.setContent(entityManager
+					.createQuery(query.orderBy(criteriaBuilder.desc(computer.get(filter))))
+					.setFirstResult(page.getNumber() - 1 * page.getSize()).setMaxResults(page.getSize()).getResultList()
+					.stream().map(c -> mapper.mapToComputer(c)).map(Optional::ofNullable).collect(Collectors.toList()));
+		}
 		return page;
 	}
 
@@ -102,13 +103,21 @@ public class ComputerDAO {
 	 * @return page of computers
 	 */
 	public Page<Computer> getComputerPaginatedByNameFilter(Page<Computer> page) {
-		String query = SQL_SEARCH_COMPUTER_BY_NAME_FILTER
-				+ SQL_ORDER_BY_AND_OFFSET.replaceFirst(":filter", page.getFilter().getAttribute())
-						.replaceFirst(":order", page.getOrder().name());
-		SqlParameterSource parameters = new MapSqlParameterSource().addValue("size", page.getSize()).addValue("offset",
-				(page.getNumber() - 1) * page.getSize());
-		List<Computer> computerList = namedParamJdbcTemplate.query(query, parameters, mapper);
-		page.setContent(computerList.stream().map(Optional::ofNullable).collect(Collectors.toList()));
+		logger.debug("Getting page of computers ...");
+		CriteriaQuery<ComputerEntity> query = criteriaBuilder.createQuery(ComputerEntity.class);
+		Root<ComputerEntity> computer = query.from(ComputerEntity.class);
+		String filter = page.getFilter().getAttribute();
+		if (page.getOrder() == SortingOrder.ASC) {
+			page.setContent(entityManager
+					.createQuery(query.orderBy(criteriaBuilder.asc(computer.get(filter))))
+					.setFirstResult(page.getNumber()).setMaxResults(page.getSize()).getResultList()
+					.stream().map(c -> mapper.mapToComputer(c)).map(Optional::ofNullable).collect(Collectors.toList()));
+		} else {
+			page.setContent(entityManager
+					.createQuery(query.orderBy(criteriaBuilder.desc(computer.get(filter))))
+					.setFirstResult(page.getNumber()).setMaxResults(page.getSize()).getResultList()
+					.stream().map(c -> mapper.mapToComputer(c)).map(Optional::ofNullable).collect(Collectors.toList()));
+		}
 		return page;
 	}
 
@@ -118,11 +127,14 @@ public class ComputerDAO {
 	 * @throws SQLException
 	 */
 	public void createComputer(Computer computer) {
+		logger.debug("Inserting computer into database ...");
 		if (computer != null) {
 			logger.debug("Creating computer " + computer);
-			SqlParameterSource parameters = new BeanPropertySqlParameterSource(computer);
-			namedParamJdbcTemplate.update(SQL_CREATE_COMPUTER, parameters);
-			logger.info("Computer succesfully added to the database.");
+			Session s = session.openSession();
+			Transaction tx = s.beginTransaction();
+			s.save(computer);
+			tx.commit();
+			session.close();
 		}
 	}
 
@@ -135,9 +147,13 @@ public class ComputerDAO {
 	 */
 	public void updateComputerById(Computer computer, long id) {
 		logger.debug("Updating computer with id " + id);
-		SqlParameterSource parameters = new BeanPropertySqlParameterSource(computer);
-		namedParamJdbcTemplate.update(SQL_UPDATE_COMPUTER_BY_ID, parameters);
-		logger.info("Computer succesfully updated.");
+		CriteriaUpdate<Computer> query = criteriaBuilder.createCriteriaUpdate(Computer.class);
+		Root<Computer> root = query.from(Computer.class);
+		query.set(root.get("name"), computer.getName()).set(root.get("introduced"), computer.getIntroduced())
+				.set(root.get("discontinued"), computer.getDiscontinued())
+				.set(root.get("company_id"), computer.getCompany() != null ? computer.getCompany().getId() : null)
+				.where(criteriaBuilder.equal(root.get("id"), computer.getId()));
+		session.openSession().createQuery(query).executeUpdate();
 	}
 
 	/**
@@ -148,8 +164,10 @@ public class ComputerDAO {
 	 */
 	public void deleteComputerById(long computerId) {
 		logger.debug("Deleting computer with id " + computerId);
-		SqlParameterSource parameters = new MapSqlParameterSource().addValue("id", computerId);
-		namedParamJdbcTemplate.update(SQL_DELETE_COMPUTER_BY_ID, parameters);
+		CriteriaDelete<ComputerEntity> computerQuery = criteriaBuilder.createCriteriaDelete(ComputerEntity.class);
+		Root<ComputerEntity> computer = computerQuery.from(ComputerEntity.class);
+		computerQuery.where(criteriaBuilder.equal(computer.get("id"), computerId));
+		entityManager.createQuery(computerQuery).executeUpdate();
 	}
 
 }

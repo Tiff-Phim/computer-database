@@ -46,7 +46,7 @@ public class DashboardController {
 	}
 
 	@GetMapping
-	public ModelAndView getDash(@RequestParam(required = false) Integer page,
+	public ModelAndView getDashboard(@RequestParam(required = false) Integer page,
 			@RequestParam(required = false) String search, @SessionAttribute(required = false) Integer pageSize,
 			@SessionAttribute(required = false) FilterAttribute filter,
 			@SessionAttribute(required = false) SortingOrder order) {
@@ -114,7 +114,7 @@ public class DashboardController {
 
 	private int getTotal(ModelAndView mv) {
 		mv.addObject(ATT_COMPUTER_TOTAL, this.computerService.getTotal());
-		return this.computerService.getTotal();
+		return this.computerService.getTotal().intValue();
 	}
 
 	private void addPageIndexes(ModelAndView mv, Page<Computer> computerPage, int total) {

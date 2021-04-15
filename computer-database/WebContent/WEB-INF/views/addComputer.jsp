@@ -30,7 +30,7 @@
 							<div class="form-group">
 								<fmt:message key="label.computerName" var="nameTranslation"/>
 								<label for="computerName">${ nameTranslation }</label> 
-								<form:input type="text" class="form-control" id="name" path="name" placeholder="${ nameTranslation }"/>
+								<form:input type="text" class="form-control" id="name" path="name" placeholder="${ nameTranslation }" required=""/>
 								<form:errors path="name" cssClass="error" />
 							</div>
 							<div class="form-group">

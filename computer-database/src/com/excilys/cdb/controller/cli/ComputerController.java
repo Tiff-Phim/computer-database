@@ -17,7 +17,7 @@ public class ComputerController {
 		this.computerService = computerService;
 	}
 	
-	public int getTotal() {
+	public Long getTotal() {
 		return this.computerService.getTotal();
 	}
 	

@@ -2,19 +2,13 @@ package com.excilys.cdb.config;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.sql.DataSource;
+import javax.servlet.ServletRegistration.Dynamic;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -30,51 +24,26 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
 @Configuration
 @EnableWebMvc
-@EnableTransactionManagement
-@ComponentScan({ "com.excilys.cdb.dao", "com.excilys.cdb.service", "com.excilys.cdb.servlet",
-		"com.excilys.cdb.controller", "com.excilys.cdb.mapper", "com.excilys.cdb.validator" })
+@ComponentScan({ "com.excilys.cdb.dao", "com.excilys.cdb.service", "com.excilys.cdb.controller.cli",
+		"com.excilys.cdb.controller.web", "com.excilys.cdb.mapper", "com.excilys.cdb.validator",
+		"com.excilys.cdb.exception", "com.excilys.cdb.config" })
 public class WebConfig implements WebMvcConfigurer, WebApplicationInitializer {
 
-	private static final String PROP_FILE_NAME = "/config/db.properties";
-	
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 		messageSource.setBasenames("languages/messages");
-		messageSource.setDefaultEncoding("UTF-8");		
+		messageSource.setDefaultEncoding("UTF-8");
 		return messageSource;
 	}
 
 	@Bean
 	public LocaleResolver localeResolver() {
-	    return new CookieLocaleResolver();
+		return new CookieLocaleResolver();
 	}
 
-	@Bean
-	public DataSource getDataSource() {
-		return new HikariDataSource(new HikariConfig(PROP_FILE_NAME));
-	}
-
-	@Bean
-	public JdbcTemplate getJdbcTemplate() {
-		return new JdbcTemplate(getDataSource());
-	}
-
-	@Bean
-	public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
-		return new NamedParameterJdbcTemplate(getDataSource());
-	}
-
-	@Bean
-	public PlatformTransactionManager manager() {
-		return new DataSourceTransactionManager(getDataSource());
-	}
-	
 	@Bean
 	public ViewResolver viewResolver() {
 		InternalResourceViewResolver bean = new InternalResourceViewResolver();
@@ -107,7 +76,10 @@ public class WebConfig implements WebMvcConfigurer, WebApplicationInitializer {
 		context.register(WebConfig.class);
 		context.setServletContext(servletContext);
 
-		ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(context));
+		DispatcherServlet ds = new DispatcherServlet(context);
+		ds.setThrowExceptionIfNoHandlerFound(true);
+
+		Dynamic servlet = servletContext.addServlet("dispatcher", ds);
 		servlet.setLoadOnStartup(1);
 		servlet.addMapping("/");
 	}

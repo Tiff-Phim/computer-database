@@ -34,7 +34,7 @@
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName"><fmt:message key="label.computerName"/></label>
-                                <form:input type="text" class="form-control" id="computerName" path="name" placeholder="${computer.getName()}"/>
+                                <form:input type="text" class="form-control" id="computerName" path="name" placeholder="${computer.getName()}" required=""/>
                                 <form:errors path="name" cssClass="error" />
                             </div>
                             <div class="form-group">

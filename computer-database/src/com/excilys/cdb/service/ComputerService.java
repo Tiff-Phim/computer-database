@@ -17,7 +17,7 @@ public class ComputerService {
 		this.computerDAO = computerDAO;
 	}
 	
-	public int getTotal() {
+	public Long getTotal() {
 		return this.computerDAO.getTotalComputers();
 	}
 

@@ -1,4 +1,6 @@
-package com.excilys.cdb.dto;
+package com.excilys.cdb.dto.web;
+
+import java.io.Serializable;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -6,8 +8,9 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class EditComputerDTO {
+public class EditComputerDTO implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	@NotNull
 	public String id;
 	@NotEmpty(message = "{computer.name.required}")
