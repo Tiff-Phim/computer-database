@@ -33,6 +33,7 @@
 		<slf4j.version>1.7.30</slf4j.version>
 		<HikariCP.version>4.0.3</HikariCP.version>
 
+		<jackson.version>2.12.3</jackson.version>
 		<javax.servlet-api.version>4.0.1</javax.servlet-api.version>
 		<jstl.version>1.2</jstl.version>
 	</properties>
@@ -113,6 +114,13 @@
 
 
 			<!-- WEBAPP DEPENDENCIES -->
+			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			
 			<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
 			<dependency>
 				<groupId>javax.servlet</groupId>

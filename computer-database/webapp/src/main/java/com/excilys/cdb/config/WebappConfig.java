@@ -28,7 +28,7 @@ import org.springframework.web.servlet.view.JstlView;
 @EnableWebMvc
 @ComponentScan({ "com.excilys.cdb.config", "com.excilys.cdb.service", "com.excilys.cdb.console.controller",
 	"com.excilys.cdb.webapp.controller", "com.excilys.cdb.binding.web", "com.excilys.cdb.binding.validator",
-	"com.excilys.cdb.binding.persistence.mapper", "com.excilys.cdb.persistence" })
+	"com.excilys.cdb.binding.persistence.mapper", "com.excilys.cdb.persistence", "com.excilys.cdb.webapp.api" })
 public class WebappConfig implements WebMvcConfigurer, WebApplicationInitializer {
 
 	@Bean

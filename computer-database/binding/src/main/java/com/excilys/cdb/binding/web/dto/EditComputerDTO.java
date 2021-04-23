@@ -8,6 +8,8 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class EditComputerDTO implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -16,8 +18,10 @@ public class EditComputerDTO implements Serializable {
 	@NotEmpty(message = "{computer.name.required}")
 	@Pattern(regexp = "^[a-zA-Z].*", message = "{computer.name.invalid}")
 	public String name;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	public String introduced;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	public String discontinued;
 	public String companyId;

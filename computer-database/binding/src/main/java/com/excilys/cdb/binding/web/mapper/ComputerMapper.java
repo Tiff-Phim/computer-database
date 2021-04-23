@@ -33,6 +33,16 @@ public class ComputerMapper {
 		}
 		return null;
 	}
+	
+	public ComputerDTO mapToComputerDTO(Computer computer) {
+		if (computer != null) {
+			return new ComputerDTO(computer.getId(), computer.getName(),
+					computer.getIntroduced() != null ? computer.getIntroduced().toString() : "Unknown",
+					computer.getDiscontinued() != null ? computer.getDiscontinued().toString() : "Unknown",
+					computer.getCompany().getName() != null ? computer.getCompany().getName() : "Unknown");
+		}
+		return null;
+	}
 
 	public List<ComputerDTO> mapListComputerToListComputerDTO(List<Optional<Computer>> computers) {
 		List<ComputerDTO> listComputer = computers.stream()
@@ -45,13 +55,16 @@ public class ComputerMapper {
 	}
 
 	public Computer mapAddComputerDTOToComputer(AddComputerDTO computerDTO) {
-		Company company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+		Company company = new Company.CompanyBuilder().build();
+		if (computerDTO.getCompanyId() != null) {
+			company = new Company.CompanyBuilder().setId(Long.valueOf(computerDTO.getCompanyId())).build();
+		}
 
 		return new Computer.ComputerBuilder().setName(computerDTO.getName())
 				.setIntroduced(
-						computerDTO.getIntroduced().isEmpty() ? null : LocalDate.parse(computerDTO.getIntroduced()))
+						computerDTO.getIntroduced() == null ? null : LocalDate.parse(computerDTO.getIntroduced()))
 				.setDiscontinued(
-						computerDTO.getDiscontinued().isEmpty() ? null : LocalDate.parse(computerDTO.getDiscontinued()))
+						computerDTO.getDiscontinued() == null ? null : LocalDate.parse(computerDTO.getDiscontinued()))
 				.setCompany(company).build();
 	}
 

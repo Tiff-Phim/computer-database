@@ -22,6 +22,7 @@ import com.excilys.cdb.binding.persistence.dto.ComputerEntity;
 import com.excilys.cdb.binding.persistence.mapper.CompanyDAOMapper;
 import com.excilys.cdb.core.Company;
 import com.excilys.cdb.core.Page;
+import com.excilys.cdb.exception.CompanyNotFoundException;
 
 @Repository
 public class CompanyDAO {
@@ -42,7 +43,6 @@ public class CompanyDAO {
 	 * Lists all companies present in database.
 	 * 
 	 * @return companies all the companies stored in database
-	 * @throws SQLException
 	 */
 	public List<Optional<Company>> findAllCompanies() {
 		logger.debug("Getting all companies ...");
@@ -53,7 +53,21 @@ public class CompanyDAO {
 		return entityManager.createQuery(query).getResultList().stream().map(c -> mapper.mapToCompany(c))
 				.map(Optional::ofNullable).collect(Collectors.toList());
 	}
-
+	
+	/**
+	 * Find a company by its id.
+	 * 
+	 * @return company details
+	 * @throws SQLException
+	 */
+	public Optional<Company> findCompanyById(long companyId) throws CompanyNotFoundException {
+		logger.debug("Searching for company with id " + companyId);
+		CriteriaQuery<CompanyEntity> query = criteriaBuilder.createQuery(CompanyEntity.class);
+		Root<CompanyEntity> company = query.from(CompanyEntity.class);
+		query.select(company).where(criteriaBuilder.equal(company.get("id"), companyId));
+		return Optional.ofNullable(mapper.mapToCompany(entityManager.createQuery(query).getSingleResult()));
+	}
+	
 	/**
 	 * List companies present in database, paginated.
 	 * 
@@ -81,7 +95,7 @@ public class CompanyDAO {
 	 * @throws SQLException
 	 */
 	@Transactional
-	public void deleteCompanyById(long id) {
+	public void deleteCompanyById(long id) throws CompanyNotFoundException {
 		logger.debug("Deleting company with id " + id);
 		CriteriaDelete<ComputerEntity> computerQuery = criteriaBuilder.createCriteriaDelete(ComputerEntity.class);
 		Root<ComputerEntity> computer = computerQuery.from(ComputerEntity.class);

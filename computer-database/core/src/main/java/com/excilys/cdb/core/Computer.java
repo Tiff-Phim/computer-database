@@ -12,19 +12,6 @@ import java.time.LocalDate;
 public class Computer {
 
 	private long id;
-
-	public void setIntroduced(LocalDate introduced) {
-		this.introduced = introduced;
-	}
-
-	public void setDiscontinued(LocalDate discontinued) {
-		this.discontinued = discontinued;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
 	private String name;
 	private LocalDate introduced;
 	private LocalDate discontinued;
@@ -92,6 +79,10 @@ public class Computer {
 	public LocalDate getIntroduced() {
 		return introduced;
 	}
+	
+	public void setIntroduced(LocalDate introduced) {
+		this.introduced = introduced;
+	}
 
 	/**
 	 * Fetches the computer date when it was discontinued.
@@ -101,6 +92,10 @@ public class Computer {
 	public LocalDate getDiscontinued() {
 		return discontinued;
 	}
+	
+	public void setDiscontinued(LocalDate discontinued) {
+		this.discontinued = discontinued;
+	}
 
 	/**
 	 * Fetches the associated company.
@@ -109,6 +104,10 @@ public class Computer {
 	 */
 	public Company getCompany() {
 		return company;
+	}
+	
+	public void setCompany(Company company) {
+		this.company = company;
 	}
 	
 	public Long getCompanyId() {

@@ -8,8 +8,20 @@ public class ComputerNotFoundException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 
-	public ComputerNotFoundException(String message) {
-		super("Computer not found");
+	public ComputerNotFoundException() {
+		super();
+	}
+	
+	public ComputerNotFoundException(final Throwable cause) {
+		super(cause);
+	}
+	
+	public ComputerNotFoundException(final String message) {
+		super(message);
+	}
+	
+	public ComputerNotFoundException(final String message, final Throwable cause) {
+		super(message, cause);
 	}
 
 }

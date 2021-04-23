@@ -1,6 +1,7 @@
 package com.excilys.cdb.persistence;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import com.excilys.cdb.binding.persistence.mapper.ComputerDAOMapper;
 import com.excilys.cdb.core.Computer;
 import com.excilys.cdb.core.Page;
 import com.excilys.cdb.core.Page.SortingOrder;
+import com.excilys.cdb.exception.ComputerNotFoundException;
 
 @Repository
 public class ComputerDAO {
@@ -54,6 +56,21 @@ public class ComputerDAO {
 		query.select(criteriaBuilder.count(computer));
 		return entityManager.createQuery(query).getSingleResult();
 	}
+	
+	/**
+	 * List all computers present in database.
+	 * 
+	 * @return computers
+	 */
+	public List<Optional<Computer>> findAllComputers() {
+		logger.debug("Getting all computers ...");
+		CriteriaQuery<ComputerEntity> query = criteriaBuilder.createQuery(ComputerEntity.class);
+		Root<ComputerEntity> computer = query.from(ComputerEntity.class);
+		query.select(computer);
+		
+		return entityManager.createQuery(query).getResultList().stream().map(c -> mapper.mapToComputer(c))
+				.map(Optional::ofNullable).collect(Collectors.toList());
+	}
 
 	/**
 	 * Find a computer by its id.
@@ -61,7 +78,7 @@ public class ComputerDAO {
 	 * @return computer details
 	 * @throws SQLException
 	 */
-	public Optional<Computer> findComputerById(long computerId) {
+	public Optional<Computer> findComputerById(long computerId) throws ComputerNotFoundException {
 		logger.debug("Searching for computer with id " + computerId);
 		CriteriaQuery<ComputerEntity> query = criteriaBuilder.createQuery(ComputerEntity.class);
 		Root<ComputerEntity> computer = query.from(ComputerEntity.class);
@@ -164,7 +181,7 @@ public class ComputerDAO {
 	 * @param computerId the id of the computer to delete
 	 * @throws SQLException
 	 */
-	public void deleteComputerById(long computerId) {
+	public void deleteComputerById(long computerId) throws ComputerNotFoundException {
 		logger.debug("Deleting computer with id " + computerId);
 		entityManager.getTransaction().begin();
 		CriteriaDelete<ComputerEntity> computerQuery = criteriaBuilder.createCriteriaDelete(ComputerEntity.class);

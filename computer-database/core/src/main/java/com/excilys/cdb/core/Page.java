@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 public class Page<E> {
 
 	private static final int OFFSET = 5;
+	public static final int DEFAULT_PAGE_NUMBER = 1;
 	public static final int DEFAULT_PAGE_SIZE = 10;
 	public static final FilterAttribute DEFAULT_PAGE_FILTER = FilterAttribute.COMPUTER_ID;
 	public static final SortingOrder DEFAULT_SORTING_ORDER = SortingOrder.ASC;
@@ -62,6 +63,13 @@ public class Page<E> {
 		this.order = DEFAULT_SORTING_ORDER;
 		this.filter = DEFAULT_PAGE_FILTER;
 		this.number = number;
+	}
+
+	public Page(int size, int number, SortingOrder order, FilterAttribute filter) {
+		this.size = size;
+		this.number = number;
+		this.order = order;
+		this.filter = filter;
 	}
 
 	public int getSize() {
@@ -141,6 +149,38 @@ public class Page<E> {
 			start = end - OFFSET + 1;
 		}
 		return IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
+	}
+	
+	public static class PageBuilder {
+		
+		private int size = Page.DEFAULT_PAGE_SIZE;
+		private int number = Page.DEFAULT_PAGE_NUMBER;
+		private SortingOrder order = Page.DEFAULT_SORTING_ORDER;
+		private FilterAttribute filter = Page.DEFAULT_PAGE_FILTER;
+		
+		public PageBuilder setSize(int size) {
+			this.size = size;
+			return this;
+		}
+		
+		public PageBuilder setNumber(int number) {
+			this.number = number;
+			return this;
+		}
+		
+		public PageBuilder setOrder(SortingOrder order) {
+			this.order = order;
+			return this;
+		}
+		
+		public PageBuilder setFilter(FilterAttribute filter) {
+			this.filter = filter;
+			return this;
+		}
+		
+		public Page build() {
+			return new Page(size, number, order, filter);
+		}
 	}
 
 	@Override
